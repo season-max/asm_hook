@@ -1,0 +1,6 @@
+
+rootProject.name = "asm_hook"
+include ':app'
+include ':plugin_privacy'
+include ':asm_annotation'
+include ':toolsLibrary'

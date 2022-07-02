@@ -1,0 +1,23 @@
+project.ext {
+
+    /** 包名 **/
+    applicationId = "com.zhangyue.ireader.asm_hook"
+
+    /** 编译sdk版本 **/
+    compileSdkVersion = 30
+
+    /** 构建工具版本 **/
+    buildToolsVersion = "29.0.1"
+
+    /** 支持最低版本 **/
+    minSdkVersion = 19
+
+    /** 目标版本 **/
+    targetSdkVersion = 30
+
+    versionCode = 1
+
+    versionName = "1.0.0"
+
+    enable_privacy_plugin = enable_privacy_plugin.toBoolean()
+}

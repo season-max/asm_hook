@@ -1,0 +1,36 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+apply from : 'config.gradle'
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+        if(rootProject.enable_privacy_plugin) {
+            maven {
+                url uri('./repo')
+            }
+        }
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.5.4'
+        if (rootProject.enable_privacy_plugin) {
+            classpath 'com.zhangyue.gradle.plugins:plugin_privacy:1.0.0'
+        }
+    }
+
+}
+
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

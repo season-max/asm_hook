@@ -1,0 +1,84 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.zhangyue.gradle.plugins",
+    "module": "plugin_privacy",
+    "version": "1.0.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "6.2",
+      "buildId": "uth3jnybtfbzbkmc3ryzrh7dsa"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 7,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "plugin_privacy-1.0.0.jar",
+          "url": "plugin_privacy-1.0.0.jar",
+          "size": 61009,
+          "sha512": "b108322162697809b1f46e967c6287a98efd08546bcd1b0ae3a744601ca2511f82463763c9a38919b307df8599b7c1fa69e980c90686a1ada6f13f044b234434",
+          "sha256": "ade9738c1cf139188737a09cd1e25d6c6b60f9cce480cbfcc1597f67926c53e4",
+          "sha1": "3b33a056cbdbdbd17ed31d6239bbdcdeee87c972",
+          "md5": "b9e5b7e69f608626549ccec0ab8d05ad"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 7,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.ow2.asm",
+          "module": "asm",
+          "version": {
+            "requires": "9.2"
+          }
+        },
+        {
+          "group": "org.ow2.asm",
+          "module": "asm-commons",
+          "version": {
+            "requires": "9.2"
+          }
+        },
+        {
+          "group": "com.android.tools.build",
+          "module": "gradle",
+          "version": {
+            "requires": "3.5.4"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "plugin_privacy-1.0.0.jar",
+          "url": "plugin_privacy-1.0.0.jar",
+          "size": 61009,
+          "sha512": "b108322162697809b1f46e967c6287a98efd08546bcd1b0ae3a744601ca2511f82463763c9a38919b307df8599b7c1fa69e980c90686a1ada6f13f044b234434",
+          "sha256": "ade9738c1cf139188737a09cd1e25d6c6b60f9cce480cbfcc1597f67926c53e4",
+          "sha1": "3b33a056cbdbdbd17ed31d6239bbdcdeee87c972",
+          "md5": "b9e5b7e69f608626549ccec0ab8d05ad"
+        }
+      ]
+    }
+  ]
+}

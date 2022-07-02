@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingStart="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="测试用例" />
+
+        <CheckBox
+            android:id="@+id/cbAgree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="同意隐私" />
+
+        <TextView
+            android:text="ActivityManager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+        <Button
+            android:id="@+id/btnGetRunningAppProcesses"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="getRunningAppProcesses"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btnGetRecentTasks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="getRecentTasks"
+            android:textAllCaps="false" />
+        <Button
+            android:id="@+id/btnGetRunningTasks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="getRunningTasks"
+            android:textAllCaps="false" />
+
+
+
+        <TextView
+            android:text="TelephonyManager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/btnGetAllCellInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="getAllCellInfo"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btnGetDeviceId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="getDeviceId"
+            android:textAllCaps="false" />
+
+
+        <Button
+            android:id="@+id/getImei"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="getImei"
+            android:textAllCaps="false" />
+
+
+        <Button
+            android:id="@+id/getSimSerialNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="getSimSerialNumber"
+            android:textAllCaps="false" />
+
+
+        <TextView
+            android:text="Settings.System"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/btnGetIdAndroid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="getAndroidId"
+            android:textAllCaps="false" />
+
+        <TextView
+            android:text="WifiManager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/getSSID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="getSSID"
+            android:textAllCaps="false" />
+        <Button
+            android:id="@+id/getBSSID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="getBSSID"
+            android:textAllCaps="false" />
+        <Button
+            android:id="@+id/getMacAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="getMacAddress"
+            android:textAllCaps="false" />
+        <Button
+            android:id="@+id/getConfiguredNetworks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="getConfiguredNetworks"
+            android:textAllCaps="false" />
+
+
+        <TextView
+            android:text="SensorManager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+        <Button
+            android:id="@+id/getSensorList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="getSensorList"
+            android:textAllCaps="false" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="WifiManager" />
+
+
+        <Button
+            android:id="@+id/getDhcpInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="getDhcpInfo"
+            android:textAllCaps="false" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LocationManager" />
+
+
+        <Button
+            android:id="@+id/getLastKnownLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="getLastKnownLocation"
+            android:textAllCaps="false" />
+        <Button
+            android:id="@+id/requestLocationUpdates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="requestLocationUpdates"
+            android:textAllCaps="false" />
+
+
+    </LinearLayout>
+
+</ScrollView>

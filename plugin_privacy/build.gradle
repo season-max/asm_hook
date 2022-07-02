@@ -1,0 +1,36 @@
+plugins {
+    id 'java-library'
+    id 'groovy'
+}
+
+apply from : '../upload_plugin.gradle'
+
+sourceSets {
+    main {
+        java {
+            srcDir '../plugin_privacy/src/main/java'
+        }
+
+        groovy {
+            srcDir '../plugin_privacy/src/main/groovy'
+        }
+
+        resources {
+            srcDir '../plugin_privacy/src/main/resources'
+        }
+    }
+}
+
+
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+    implementation 'org.ow2.asm:asm:9.2'
+    implementation 'org.ow2.asm:asm-commons:9.2'
+    implementation 'com.android.tools.build:gradle:3.5.4'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+}
