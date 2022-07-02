@@ -2,11 +2,14 @@ package com.zhangyue.ireader.plugin_privacy
 
 import com.zhangyue.ireader.plugin_privacy.asmItem.MethodReplaceItem
 
+import java.util.concurrent.CopyOnWriteArraySet
+import java.util.concurrent.LinkedBlockingQueue
+
 class PrivacyGlobalConfig {
 
-    public static final List<MethodReplaceItem> methodReplaceItemList = new ArrayList<>()
+    public static final Queue<MethodReplaceItem> methodReplaceItemList = new LinkedBlockingQueue<>()
 
-    public static Set<String> filterClassName = new HashSet<>()
+    public static Set<String> filterClassName = new CopyOnWriteArraySet<>()
 
     public static boolean isDebug = false
 
