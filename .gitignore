@@ -13,6 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+asm_annotation/build
 
 # Built application files
 *.apk
