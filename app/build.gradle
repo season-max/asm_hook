@@ -8,7 +8,7 @@ if (rootProject.enable_privacy_plugin) {
         isDebug = false
         handle_annotation_desc = 'Lcom/zhangyue/ireader/asm_annotation/AsmMethodReplace;'
         inject = true
-        exclude = []
+        exclude = ['android.support', 'androidx']
     }
 }
 

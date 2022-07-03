@@ -11,7 +11,7 @@
   "createdBy": {
     "gradle": {
       "version": "6.2",
-      "buildId": "ptrghbvo3zgpzpxl3v554lgcly"
+      "buildId": "l3aecqh4njfgnmocstw37od6qe"
     }
   },
   "variants": [
@@ -28,11 +28,11 @@
         {
           "name": "plugin_privacy-1.0.0.jar",
           "url": "plugin_privacy-1.0.0.jar",
-          "size": 61049,
-          "sha512": "df2a8bdf3488a65b5b532f200190a5823a64bc722eeaf487361db436b5ed53289c5bc65b8650277020b7283072d9b54d1b4cb28bbac1096a15794372f8b654c6",
-          "sha256": "eec3d2fcd5affd5944c13723bda9884d3794dbfd32a345156a4df8b7f4cab7d7",
-          "sha1": "0726b2b6f26f5c71f453877ce399c740ad36de0e",
-          "md5": "0fcf7795792d4bf8a94c72b2a538000b"
+          "size": 63179,
+          "sha512": "4ef5bf6641393af0bae7f5f07dfa1c813514a171b259bb2dcb61cc7600498bad40e7f3311e1225663816ef34f8087919be177578eb40f33d70e4024a36dea4a7",
+          "sha256": "9b97ce32bef6db6784fac089c32e3dc020979b343e3e41200942931a0dfdeb00",
+          "sha1": "a2ea971fc603e203df4df74f40c48c72b1b54ae6",
+          "md5": "0642575473cb5e4f07b3a805cd6c8004"
         }
       ]
     },
@@ -72,11 +72,11 @@
         {
           "name": "plugin_privacy-1.0.0.jar",
           "url": "plugin_privacy-1.0.0.jar",
-          "size": 61049,
-          "sha512": "df2a8bdf3488a65b5b532f200190a5823a64bc722eeaf487361db436b5ed53289c5bc65b8650277020b7283072d9b54d1b4cb28bbac1096a15794372f8b654c6",
-          "sha256": "eec3d2fcd5affd5944c13723bda9884d3794dbfd32a345156a4df8b7f4cab7d7",
-          "sha1": "0726b2b6f26f5c71f453877ce399c740ad36de0e",
-          "md5": "0fcf7795792d4bf8a94c72b2a538000b"
+          "size": 63179,
+          "sha512": "4ef5bf6641393af0bae7f5f07dfa1c813514a171b259bb2dcb61cc7600498bad40e7f3311e1225663816ef34f8087919be177578eb40f33d70e4024a36dea4a7",
+          "sha256": "9b97ce32bef6db6784fac089c32e3dc020979b343e3e41200942931a0dfdeb00",
+          "sha1": "a2ea971fc603e203df4df74f40c48c72b1b54ae6",
+          "md5": "0642575473cb5e4f07b3a805cd6c8004"
         }
       ]
     }

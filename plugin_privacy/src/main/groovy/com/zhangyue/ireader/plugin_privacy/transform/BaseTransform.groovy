@@ -1,15 +1,6 @@
 package com.zhangyue.ireader.plugin_privacy.transform
 
-import com.android.build.api.transform.Context
-import com.android.build.api.transform.DirectoryInput
-import com.android.build.api.transform.Format
-import com.android.build.api.transform.JarInput
-import com.android.build.api.transform.QualifiedContent
-import com.android.build.api.transform.Status
-import com.android.build.api.transform.Transform
-import com.android.build.api.transform.TransformException
-import com.android.build.api.transform.TransformInvocation
-import com.android.build.api.transform.TransformOutputProvider
+import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.zhangyue.ireader.plugin_privacy.PrivacyGlobalConfig
 import com.zhangyue.ireader.plugin_privacy.util.CommonUtil
@@ -18,18 +9,16 @@ import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
 
 import java.util.concurrent.AbstractExecutorService
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.Executors
-import java.util.concurrent.FutureTask
+import java.util.concurrent.Callable
+import java.util.concurrent.ForkJoinPool
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 
 abstract class BaseTransform extends Transform {
-//    CountDownLatch countDownLatch = new CountDownLatch(2)
+    AbstractExecutorService executorService = ForkJoinPool.commonPool()
 
-    //N(cpu 核心数)
-    AbstractExecutorService executorService = Executors.newFixedThreadPool(6)
+    private List<Callable<Void>> taskList = new ArrayList<>()
 
     @Override
     String getName() {
@@ -78,62 +67,41 @@ abstract class BaseTransform extends Transform {
 //            }
 //        }
 
-        //2
-//        new Thread(new Runnable() {
-//            @Override
-//            void run() {
-//                inputs.each { input ->
-//                    input.jarInputs.each { JarInput jarInput ->
-//                        forEachJar(jarInput, outputProvider, context, isIncremental)
-//                    }
-//                }
-//                countDownLatch.countDown()
-//            }
-//        }).start()
-//
-//        new Thread(new Runnable() {
-//            @Override
-//            void run() {
-//                inputs.each { input ->
-//                    input.directoryInputs.each { DirectoryInput dirInput ->
-//                        forEachDir(dirInput, outputProvider, context, isIncremental)
-//                    }
-//                }
-//                countDownLatch.countDown()
-//            }
-//        }).start()
-//        countDownLatch.await()
-
         //3
-        List<FutureTask> taskList = new ArrayList<>()
         inputs.each { input ->
             input.jarInputs.each { jarInput ->
-                taskList.add(new FutureTask(new Runnable() {
+                submitTask(new Runnable() {
                     @Override
                     void run() {
                         forEachJar(jarInput, outputProvider, context, isIncremental)
                     }
-                }, null))
+                })
             }
-
-            input.directoryInputs.each { dirInput ->
-                taskList.add(new FutureTask(new Runnable() {
+            input.directoryInputs.each { DirectoryInput dirInput ->
+                submitTask(new Runnable() {
                     @Override
                     void run() {
                         forEachDir(dirInput, outputProvider, context, isIncremental)
                     }
-                }, null))
+                })
             }
         }
-        for (FutureTask task : taskList) {
-            executorService.execute(task)
-        }
-
-        taskList.each { it ->
+        def futures = executorService.invokeAll(taskList)
+        futures.each { it ->
             it.get()
         }
         onTransformEnd(transformInvocation)
         println(getName() + "transform end--------------->" + "duration : " + (System.currentTimeMillis() - startTime) + " ms")
+    }
+
+    void submitTask(Runnable runnable) {
+        taskList.add(new Callable<Void>() {
+            @Override
+            Void call() throws Exception {
+                runnable.run()
+                return null
+            }
+        })
     }
 
 
@@ -331,11 +299,23 @@ abstract class BaseTransform extends Transform {
         println()
     }
 
-    protected boolean firstTransform(){
+    protected boolean firstTransform() {
         return false
     }
 
-    protected abstract boolean shouldHookClass(String className)
+    boolean shouldHookClass(String className) {
+        def excludes = PrivacyGlobalConfig.exclude
+        if (excludes != null) {
+            for (String string : excludes) {
+                if (className.startsWith(string)) {
+                    return false
+                }
+            }
+        }
+        return shouldHookClassInner(className)
+    }
+
+    protected abstract boolean shouldHookClassInner(String className)
 
     protected abstract byte[] hookClassInner(String className, byte[] bytes)
 

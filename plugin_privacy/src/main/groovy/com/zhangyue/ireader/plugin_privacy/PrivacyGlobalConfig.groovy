@@ -20,7 +20,7 @@ class PrivacyGlobalConfig {
     /**
      * 过滤白名单
      */
-    private static Object[] exclude
+    private static String[] exclude
 
 
     static boolean isDebug() {
@@ -47,11 +47,11 @@ class PrivacyGlobalConfig {
         return handleAnnotationName
     }
 
-    static HashSet<String> getExclude() {
+    static String[] getExclude() {
         return exclude
     }
 
-    static void setExclude(Object[] excludes) {
+    static void setExclude(String[] excludes) {
         exclude = excludes
     }
 }

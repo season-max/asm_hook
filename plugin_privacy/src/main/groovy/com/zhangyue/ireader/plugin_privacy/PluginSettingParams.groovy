@@ -24,7 +24,7 @@ class PluginSettingParams {
     /**
      * 过滤白名单
      */
-    List<String> exclude = []
+    String[] exclude
 
 
 }
