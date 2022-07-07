@@ -16,8 +16,8 @@ class PluginEntry implements Plugin<Project> {
 
         project.extensions.create('privacy_plugin_config', PluginSettingParams)
 
-        def android = project.extensions.getByType(AppExtension)
-        registerTransform(android)
+        def android = project.extensions.getByType(AppExtension.class)
+        registerTransform(android,project)
 
         project.afterEvaluate {
             Logger.setIsDebug(project.privacy_plugin_config.isDebug)
@@ -37,9 +37,9 @@ class PluginEntry implements Plugin<Project> {
         Logger.info("exclude:: ${project.privacy_plugin_config.exclude}")
     }
 
-    static void registerTransform(BaseExtension android) {
-        android.registerTransform(new AnnotationParserTransform())
+    static void registerTransform(BaseExtension android,Project project) {
+        android.registerTransform(new AnnotationParserTransform(project))
 
-        android.registerTransform(new PrivacyMethodReplaceTransform())
+        android.registerTransform(new PrivacyMethodReplaceTransform(project))
     }
 }

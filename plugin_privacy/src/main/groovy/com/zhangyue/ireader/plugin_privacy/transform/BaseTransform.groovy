@@ -7,6 +7,7 @@ import com.zhangyue.ireader.plugin_privacy.util.CommonUtil
 import com.zhangyue.ireader.plugin_privacy.util.Logger
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
+import org.gradle.api.Project
 
 import java.util.concurrent.AbstractExecutorService
 import java.util.concurrent.Callable
@@ -19,6 +20,12 @@ abstract class BaseTransform extends Transform {
     AbstractExecutorService executorService = ForkJoinPool.commonPool()
 
     private List<Callable<Void>> taskList = new ArrayList<>()
+
+    protected Project project
+
+    BaseTransform(Project project) {
+        this.project = project
+    }
 
     @Override
     String getName() {
@@ -113,6 +120,8 @@ abstract class BaseTransform extends Transform {
                 directoryInput.scopes,
                 Format.DIRECTORY
         )
+        println "directoryInputPath:" + directoryInput.file.absolutePath
+        println "destPath:" + dest.absolutePath
         def srcDirPath = inputDir.absolutePath
         def destDirPath = dest.absolutePath
         def temporaryDir = context.temporaryDir
@@ -195,6 +204,8 @@ abstract class BaseTransform extends Transform {
         File destFile = outputProvider.getContentLocation(
                 //防止同名被覆盖
                 CommonUtil.generateJarFileName(jarInput.file), jarInput.contentTypes, jarInput.scopes, Format.JAR)
+        println "jarInputPath:" + jarInput.file.absolutePath
+        println "destPath:" + destFile.absolutePath
         //增量编译处理
         if (isIncremental) {
             Status status = jarInput.status

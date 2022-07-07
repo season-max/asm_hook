@@ -5,6 +5,7 @@ import com.zhangyue.ireader.plugin_privacy.PrivacyGlobalConfig
 import com.zhangyue.ireader.plugin_privacy.asmItem.MethodReplaceItem
 import com.zhangyue.ireader.plugin_privacy.util.CommonUtil
 import com.zhangyue.ireader.plugin_privacy.util.Logger
+import org.gradle.api.Project
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.tree.AnnotationNode
 import org.objectweb.asm.tree.ClassNode
@@ -15,6 +16,10 @@ import org.objectweb.asm.tree.MethodNode
  */
 class AnnotationParserTransform extends BaseTransform {
 
+
+    AnnotationParserTransform(Project project) {
+        super(project)
+    }
 
     @Override
     boolean shouldHookClassInner(String className) {

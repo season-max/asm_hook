@@ -4,6 +4,7 @@ import com.android.build.api.transform.TransformInvocation
 import com.zhangyue.ireader.plugin_privacy.PrivacyGlobalConfig
 import com.zhangyue.ireader.plugin_privacy.util.Logger
 import com.zhangyue.ireader.plugin_privacy.visitor.PrivacyClassVisitor
+import org.gradle.api.Project
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassWriter
@@ -13,6 +14,10 @@ import org.objectweb.asm.ClassWriter
  */
 class PrivacyMethodReplaceTransform extends BaseTransform {
 
+
+    PrivacyMethodReplaceTransform(Project project) {
+        super(project)
+    }
 
     @Override
     boolean shouldHookClassInner(String className) {
@@ -37,10 +42,26 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
     @Override
     void onTransformStart(TransformInvocation transformInvocation) {
         Logger.info("${getName()} start--------------->")
+        PrivacyGlobalConfig.stringBuilder.setLength(0)
     }
 
     @Override
     void onTransformEnd(TransformInvocation transformInvocation) {
         Logger.info("${getName()} end--------------->")
+        //写入文件
+        byte[] bytes = PrivacyGlobalConfig.stringBuilder.toString().getBytes("UTF-8")
+        try {
+            println "project.path= ${project.rootDir}"
+            def targetFile = new File(project.rootDir, "replaceInsn.txt")
+            if (targetFile.exists()) {
+                targetFile.delete()
+            }
+            targetFile.withOutputStream { it ->
+                it.write(bytes)
+            }
+            println "写文件结束，path${targetFile.absolutePath}"
+        } catch (Exception e) {
+
+        }
     }
 }

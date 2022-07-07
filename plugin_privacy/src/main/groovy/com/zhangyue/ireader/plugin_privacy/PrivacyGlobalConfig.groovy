@@ -18,6 +18,11 @@ class PrivacyGlobalConfig {
     public static boolean shouldInject
 
     /**
+     * 用来存储替换的字节码
+     */
+    public static StringBuilder stringBuilder = new StringBuilder()
+
+    /**
      * 过滤白名单
      */
     private static String[] exclude

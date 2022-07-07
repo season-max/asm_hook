@@ -43,6 +43,17 @@ class PrivacyMethodVisitor extends AdviceAdapter {
                 "to " +
                 " ${item.replaceOpcode} ${item.replaceClass} ${item.replaceMethod} ${item.replaceDesc} "
         )
+        PrivacyGlobalConfig.stringBuilder.append("targetClass=${className}")
+        PrivacyGlobalConfig.stringBuilder.append("\r\n")
+        PrivacyGlobalConfig.stringBuilder.append("opcode=${item.targetOpcode}, owner=${item.targetOwner}, name=${item.targetMethod}, descriptor=${item.targetDesc}")
+        PrivacyGlobalConfig.stringBuilder.append("\r\n")
+        PrivacyGlobalConfig.stringBuilder.append('------>')
+        PrivacyGlobalConfig.stringBuilder.append("\r\n")
+        PrivacyGlobalConfig.stringBuilder.append("opcode=${item.replaceOpcode}, owner=${item.replaceClass}, name=${item.replaceMethod}, descriptor=${item.replaceDesc}")
+        PrivacyGlobalConfig.stringBuilder.append("\r\n")
+        PrivacyGlobalConfig.stringBuilder.append("\r\n")
+        PrivacyGlobalConfig.stringBuilder.append("\r\n")
+        println "PrivacyGlobalConfig.stringBuilder::${PrivacyGlobalConfig.stringBuilder.toString()}"
     }
 
 }
