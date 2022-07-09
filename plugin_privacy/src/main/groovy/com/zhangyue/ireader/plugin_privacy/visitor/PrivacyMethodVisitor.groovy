@@ -54,7 +54,7 @@ class PrivacyMethodVisitor extends AdviceAdapter {
         PrivacyGlobalConfig.stringBuilder.append("\r\n")
         PrivacyGlobalConfig.stringBuilder.append("\r\n")
         PrivacyGlobalConfig.stringBuilder.append("\r\n")
-        println "PrivacyGlobalConfig.stringBuilder::${PrivacyGlobalConfig.stringBuilder.toString()}"
+        Logger.info "PrivacyGlobalConfig.stringBuilder::${PrivacyGlobalConfig.stringBuilder.toString()}"
     }
 
 }
