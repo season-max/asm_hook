@@ -4,7 +4,7 @@ plugins {
 }
 apply plugin: 'com.github.dcendents.android-maven' // GitHub Maven 插件
 
-group = 'com.github.season-max' // github 的用户名
+//group = 'com.github.season-max' // github 的用户名
 
 //apply from : '../upload_plugin.gradle'
 
