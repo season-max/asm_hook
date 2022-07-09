@@ -18,6 +18,7 @@ buildscript {
         if (rootProject.enable_privacy_plugin) {
             classpath 'com.zhangyue.gradle.plugins:plugin_privacy:1.0.0'
         }
+        classpath "com.github.dcendents:android-maven-gradle-plugin:2.1"
     }
 
 }

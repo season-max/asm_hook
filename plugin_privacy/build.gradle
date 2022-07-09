@@ -2,8 +2,11 @@ plugins {
     id 'java-library'
     id 'groovy'
 }
+apply plugin: 'com.github.dcendents.android-maven' // GitHub Maven 插件
 
-apply from : '../upload_plugin.gradle'
+group = 'com.github.season-max' // github 的用户名
+
+//apply from : '../upload_plugin.gradle'
 
 sourceSets {
     main {
