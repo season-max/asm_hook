@@ -2,6 +2,33 @@ plugins {
     id 'com.android.library'
 }
 
+//拷贝 aar 到 libs 目录下
+afterEvaluate {
+    android.libraryVariants.all { variant ->
+        def lastOutputFile = null
+        variant.outputs.all { output ->
+            if (output.outputFile != null && (output.outputFile.name.endsWith('.aar'))) {
+                println "variant-->${variant.name}"
+                lastOutputFile = output.outputFile
+            }
+        }
+        println "lastOutputFile-->${lastOutputFile}"
+        variant.assemble.doLast {
+            println "11111-->${lastOutputFile}"
+            if (lastOutputFile == null) return
+            def outputPath = [project.rootDir, "toolsLibrary", "libs"].join(File.separator)
+            println "2222-->${outputPath}"
+            copy {
+                from lastOutputFile
+                into outputPath
+                rename {
+                    'toolsLibrary.aar'
+                }
+            }
+        }
+    }
+}
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion

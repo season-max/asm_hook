@@ -33,4 +33,7 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+    rootProject.getSubprojects().each { project ->
+        delete project.buildDir
+    }
 }
