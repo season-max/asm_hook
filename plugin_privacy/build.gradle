@@ -6,6 +6,25 @@ apply plugin: 'com.github.dcendents.android-maven' // GitHub Maven 插件
 
 //group = 'com.github.season-max' // github 的用户名
 
+ext {
+    plugin_groupId = 'com.zhangyue.gradle.plugins'
+    plugin_artifactId = 'plugin_privacy'
+    plugin_version = '1.0.0'
+}
+
+apply plugin:'maven-publish'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = plugin_groupId
+            artifactId = plugin_artifactId
+            version = plugin_version
+
+            from components.java
+        }
+    }
+}
 //apply from : '../upload_plugin.gradle'
 
 sourceSets {
