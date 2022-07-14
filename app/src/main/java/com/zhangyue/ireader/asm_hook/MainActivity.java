@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.zhangyue.ireader.asm_hook.privacy.PrivacyActivity;
 
@@ -20,5 +21,9 @@ public class MainActivity extends AppCompatActivity {
             intent.setComponent(new ComponentName(MainActivity.this, PrivacyActivity.class));
             startActivity(intent);
         });
+    }
+
+    private static void writeToFile(String log,Throwable e){
+        Log.i("season","--->writeToFile");
     }
 }

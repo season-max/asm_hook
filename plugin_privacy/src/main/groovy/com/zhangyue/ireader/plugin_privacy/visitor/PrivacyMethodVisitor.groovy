@@ -11,19 +11,30 @@ class PrivacyMethodVisitor extends AdviceAdapter {
 
     private String className
 
-    protected PrivacyMethodVisitor(int api, MethodVisitor methodVisitor, int access, String name, String descriptor, String className) {
+    private PrivacyClassVisitor classVisitor
+
+    protected PrivacyMethodVisitor(int api, MethodVisitor methodVisitor, int access, String name, String descriptor, PrivacyClassVisitor classVisitor) {
         super(api, methodVisitor, access, name, descriptor)
-        this.className = className
+        this.className = classVisitor.className
     }
+
+    @Override
+    void visitEnd() {
+        super.visitEnd()
+    }
+
 
     @Override
     void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
         PrivacyGlobalConfig.methodReplaceItemList.each { item ->
             if (check(item, opcode, owner, name, descriptor)) {
-                opcode = item.replaceOpcode
-                owner = item.replaceClass
-                name = item.replaceMethod
-                descriptor = item.replaceDesc
+                if (PrivacyGlobalConfig.shouldInject) {
+                    opcode = item.replaceOpcode
+                    owner = item.replaceClass
+                    name = item.replaceMethod
+                    descriptor = item.replaceDesc
+                }
+
                 logSuccess(item, opcode, owner, name, descriptor)
             }
         }
@@ -37,6 +48,9 @@ class PrivacyMethodVisitor extends AdviceAdapter {
                 && item.targetDesc == descriptor)
     }
 
+    /**
+     * 静态扫描。记录包含隐私合规方法的类、方法、字节码指令等相关信息
+     */
     void logSuccess(MethodReplaceItem item, int opcode, String owner, String name, String descriptor) {
         Logger.info("targetClass:" + className)
         Logger.info("==========replace insn success " +
@@ -45,6 +59,10 @@ class PrivacyMethodVisitor extends AdviceAdapter {
                 " ${item.replaceOpcode} ${item.replaceClass} ${item.replaceMethod} ${item.replaceDesc} "
         )
         PrivacyGlobalConfig.stringBuilder.append("targetClass= ${CommonUtil.path2ClassName(className)}")
+        PrivacyGlobalConfig.stringBuilder.append("-->")
+        PrivacyGlobalConfig.stringBuilder.append("invokeMethod= ${getName()}")
+        PrivacyGlobalConfig.stringBuilder.append("-->")
+        PrivacyGlobalConfig.stringBuilder.append("invokeMethod= ${methodDesc}")
         PrivacyGlobalConfig.stringBuilder.append("\r\n")
         PrivacyGlobalConfig.stringBuilder.append("opcode=${item.targetOpcode}, owner=${item.targetOwner}, name=${item.targetMethod}, descriptor=${item.targetDesc}")
         PrivacyGlobalConfig.stringBuilder.append("\r\n")

@@ -16,7 +16,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.4'
         if (rootProject.enable_privacy_plugin) {
-            classpath 'com.zhangyue.gradle.plugins:plugin_privacy:1.0.0'
+            classpath 'com.sason-max.gradle.plugins:plugin_privacy:1.0.0'
         }
     }
 
@@ -33,7 +33,7 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
-    rootProject.getSubprojects().each { project ->
-        delete project.buildDir
-    }
+//    rootProject.getSubprojects().each { project ->
+//        delete project.buildDir
+//    }
 }

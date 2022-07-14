@@ -21,7 +21,7 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
 
     @Override
     boolean shouldHookClassInner(String className) {
-        return PrivacyGlobalConfig.shouldInject
+        return true
     }
 
     @Override
