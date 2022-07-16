@@ -1,4 +1,4 @@
-package com.zhangyue.ireader.toolslibrary.config;
+package com.zhangyue.ireader.toolslibrary.privacy_sentry;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
@@ -57,7 +57,7 @@ public class PrivacyConfig {
     private static boolean checkAgreePrivacy(String name) {
         if (!isAgreePrivacyDialog) {
             //打印堆栈
-            Log.d(TAG, "未同意隐私权限-" + name + ":stack=" + Util.getStackTrace(TAG));
+            Log.d(TAG, "未同意隐私权限-" + name);
         }
         return isAgreePrivacyDialog;
     }

@@ -26,10 +26,15 @@
        handle_annotation_desc = 'Lcom/zhangyue/ireader/asm_annotation/AsmMethodReplace;'
        inject = true
        exclude = ['android.support', 'androidx']
+       //可以使用开发者自定义的用来记录运行时调用隐私方法的工具类及相应的方法，但是方法描述符不可以更改 
+       recordOwner = "com.zhangyue.ireader.toolslibrary.Util"
+       recordMethod = "writeToFile"
+       //不可更改
+       recordDesc = "(Ljava/lang/String;)V"
    }
    ```
 
-4. 在项目运行之后，会在项目的根目录生成 **replaceInsn.txt** 文件，用来记录被 hook 的类及相应的字节码
+4. 在项目运行之后，会在项目的根目录生成 **replaceInsn.txt** 文件，用来记录被 hook 的类及相应的字节码。在 getExternalCacheDir() 目录下会记录运行时调用隐私方法的时间以及调用栈
 
 
 

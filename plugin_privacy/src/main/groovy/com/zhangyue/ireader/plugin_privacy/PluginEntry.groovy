@@ -35,6 +35,10 @@ class PluginEntry implements Plugin<Project> {
         Logger.info("should_inject:: ${project.privacy_plugin_config.inject}")
         PrivacyGlobalConfig.setExclude(project.privacy_plugin_config.exclude)
         Logger.info("exclude:: ${project.privacy_plugin_config.exclude}")
+        PrivacyGlobalConfig.recordOwner = project.privacy_plugin_config.recordOwner
+        PrivacyGlobalConfig.recordMethod = project.privacy_plugin_config.recordMethod
+        PrivacyGlobalConfig.recordDesc = project.privacy_plugin_config.recordDesc
+        println "recordOwner:${PrivacyGlobalConfig.recordOwner},recordMethod:${PrivacyGlobalConfig.recordMethod},recordDesc:${PrivacyGlobalConfig.recordDesc}"
     }
 
     static void registerTransform(BaseExtension android,Project project) {

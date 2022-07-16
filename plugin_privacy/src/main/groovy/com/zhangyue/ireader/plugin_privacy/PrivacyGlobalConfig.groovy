@@ -17,6 +17,10 @@ class PrivacyGlobalConfig {
 
     public static boolean shouldInject
 
+    public static String recordOwner
+    public static String recordMethod
+    public static String recordDesc
+
     /**
      * 用来存储替换的字节码
      */

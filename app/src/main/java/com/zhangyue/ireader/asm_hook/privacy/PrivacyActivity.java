@@ -6,8 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.content.ComponentName;
-import android.content.Intent;
 import android.hardware.Sensor;
 import android.location.Location;
 import android.location.LocationListener;
@@ -15,15 +13,13 @@ import android.net.DhcpInfo;
 import android.net.wifi.WifiConfiguration;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.telephony.CellInfo;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 
 import com.zhangyue.ireader.asm_hook.R;
-import com.zhangyue.ireader.toolslibrary.config.PrivacyConfig;
+import com.zhangyue.ireader.toolslibrary.privacy_sentry.PrivacyConfig;
 
 import java.util.List;
 

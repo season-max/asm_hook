@@ -26,5 +26,10 @@ class PluginSettingParams {
      */
     String[] exclude
 
+    String recordOwner
+
+    String recordMethod
+
+    String recordDesc
 
 }

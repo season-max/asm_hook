@@ -9,6 +9,9 @@ if (rootProject.enable_privacy_plugin) {
         handle_annotation_desc = 'Lcom/zhangyue/ireader/asm_annotation/AsmMethodReplace;'
         inject = true
         exclude = ['android.support', 'androidx']
+        recordOwner = "com.zhangyue.ireader.toolslibrary.Util"
+        recordMethod = "writeToFile"
+        recordDesc = "(Ljava/lang/String;)V"
     }
 }
 

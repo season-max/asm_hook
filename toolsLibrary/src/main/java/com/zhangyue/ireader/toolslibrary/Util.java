@@ -1,6 +1,17 @@
-package com.zhangyue.ireader.toolslibrary.config;
+package com.zhangyue.ireader.toolslibrary;
 
+import android.nfc.Tag;
 import android.os.Looper;
+import android.util.Log;
+
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class Util {
 
@@ -27,4 +38,20 @@ public class Util {
 
         return stringBuilder.toString();
     }
+
+
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS", Locale.CHINA);
+
+    public static void writeToFile(String log) {
+        String today = SIMPLE_DATE_FORMAT.format(new Date(System.currentTimeMillis()));
+        File file = new File(ConfigGlobal.getInstance().getContext().getExternalCacheDir(), "privacy_log.txt");
+        String date = today + "\r\n" + log;
+        try {
+            FileUtils.write(file, date, Charset.defaultCharset(), true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.i("saeson", "write to file success,data::" + date);
+    }
+
 }

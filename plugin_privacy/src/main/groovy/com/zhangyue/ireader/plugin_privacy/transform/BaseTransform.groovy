@@ -204,8 +204,6 @@ abstract class BaseTransform extends Transform {
         File destFile = outputProvider.getContentLocation(
                 //防止同名被覆盖
                 CommonUtil.generateJarFileName(jarInput.file), jarInput.contentTypes, jarInput.scopes, Format.JAR)
-        println "jarInputPath:" + jarInput.file.absolutePath
-        println "destPath:" + destFile.absolutePath
         //增量编译处理
         if (isIncremental) {
             Status status = jarInput.status
