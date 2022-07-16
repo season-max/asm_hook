@@ -52,11 +52,11 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
             methodNode.instructions.each { insnNode ->
                 def methodReplaceItem = searchHookPoint(insnNode)
                 if (methodReplaceItem != null) {
+                    logHookPoint(classNode.name, methodReplaceItem, methodNode, insnNode.opcode, insnNode.owner, insnNode.name, insnNode.desc, inject)
                     if (inject) {
                         //hook
                         injectInsn(insnNode, methodReplaceItem)
                     }
-                    logHookPoint(classNode.name, methodReplaceItem, methodNode, insnNode.opcode, insnNode.owner, insnNode.name, insnNode.desc, inject)
                     collectInsertInsn(insnNode, methodNode, classNode, collectMap)
                     findHookPoint = true
                 }
@@ -219,6 +219,8 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
         lintLog.append(name)
         lintLog.append("  ->  ")
         lintLog.append(desc)
+        lintLog.append("\r\n")
+        lintLog.append("\r\n")
 
         //------插入字节码指令
         lintLog.append("\r\n")
@@ -306,6 +308,7 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
         PrivacyGlobalConfig.stringBuilder.append("\r\n")
         PrivacyGlobalConfig.stringBuilder.append("opcode=${opcode}, owner=${owner}, name=${name}, descriptor=${descriptor}")
         if (inject) {
+            PrivacyGlobalConfig.stringBuilder.append("\r\n")
             PrivacyGlobalConfig.stringBuilder.append('------>')
             PrivacyGlobalConfig.stringBuilder.append("\r\n")
             PrivacyGlobalConfig.stringBuilder.append("opcode=${item.replaceOpcode}, owner=${item.replaceClass}, name=${item.replaceMethod}, descriptor=${item.replaceDesc}")
