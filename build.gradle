@@ -16,7 +16,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.4'
         if (rootProject.enable_privacy_plugin) {
-            classpath 'com.sason-max.gradle.plugins:plugin_privacy:1.0.1'
+            classpath 'com.sason-max.gradle.plugins:plugin_privacy:1.0.2'
         }
     }
 

@@ -48,15 +48,21 @@ public class Util {
     public static void writeToFile(String log) {
         String today = SIMPLE_DATE_FORMAT.format(new Date(System.currentTimeMillis()));
         File file = new File(ConfigGlobal.getInstance().getContext().getExternalCacheDir(), "privacy_log.txt");
-        String data = today + "\r\n" + log;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(today);
+        stringBuilder.append("\r\n");
+        stringBuilder.append(log);
+        stringBuilder.append("\r\n");
+        stringBuilder.append("\r\n");
+        stringBuilder.append("\r\n");
         threadPool.execute(() -> {
             try {
-                write(file, data, true);
+                write(file, stringBuilder.toString(), true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
-        Log.i("saeson", "write to file success,data::" + data);
+        Log.i("saeson", "write to file success,data::" + stringBuilder.toString());
     }
 
     private static void write(File file, String data, boolean append) throws IOException {

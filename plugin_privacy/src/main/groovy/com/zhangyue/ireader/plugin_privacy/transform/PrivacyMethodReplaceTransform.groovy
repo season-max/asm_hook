@@ -219,10 +219,8 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
         lintLog.append(name)
         lintLog.append("  ->  ")
         lintLog.append(desc)
-        lintLog.append("\r\n")
-        lintLog.append("\r\n")
 
-        //------插入字节码指令
+        //------要插入字节码指令
         lintLog.append("\r\n")
         InsnList insnList = new InsnList()
         insnList.add(new LdcInsnNode(lintLog.toString()))

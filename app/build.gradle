@@ -7,7 +7,7 @@ if (rootProject.enable_privacy_plugin) {
     privacy_plugin_config {
         isDebug = false
         handle_annotation_desc = 'Lcom/zhangyue/ireader/asm_annotation/AsmMethodReplace;'
-        inject = true
+        inject = false
         exclude = ['android.support', 'androidx']
         recordOwner = "com.zhangyue.ireader.toolslibrary.Util"
         recordMethod = "writeToFile"
