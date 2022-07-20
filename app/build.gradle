@@ -2,18 +2,25 @@ plugins {
     id 'com.android.application'
 }
 
-if (rootProject.enable_privacy_plugin) {
-    apply plugin: 'privacy.track'
-    privacy_plugin_config {
-        isDebug = false
-        handle_annotation_desc = 'Lcom/zhangyue/ireader/asm_annotation/AsmMethodReplace;'
-        inject = false
-        exclude = ['android.support', 'androidx']
-        recordOwner = "com.zhangyue.ireader.toolslibrary.Util"
-        recordMethod = "writeToFile"
-        recordDesc = "(Ljava/lang/String;)V"
-    }
+//隐私合规
+apply plugin: 'privacy.track'
+privacy_plugin_config {
+    isDebug = false
+    handle_annotation_desc = 'com.zhangyue.ireader.asm_annotation.sentry_privacy.AsmMethodReplace'
+    inject = false
+    exclude = ['android.support', 'androidx']
+    recordOwner = "com.zhangyue.ireader.toolslibrary.Util"
+    recordMethod = "writeToFile"
+    recordDesc = "(Ljava/lang/String;)V"
 }
+
+//双击防抖
+apply plugin: 'doubleclick_check'
+double_click_config {
+    checkAnnotation = 'com.zhangyue.ireader.asm_annotation.double_click.CheckDoubleClick'
+    annotationName = 'checkClick'
+}
+
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -50,4 +57,5 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     implementation project(':toolsLibrary')
+    implementation project(':asm_annotation')
 }

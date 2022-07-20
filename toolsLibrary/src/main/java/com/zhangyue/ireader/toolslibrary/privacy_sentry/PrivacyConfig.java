@@ -20,8 +20,8 @@ import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
-import com.zhangyue.ireader.asm_annotation.AsmMethodOpcodes;
-import com.zhangyue.ireader.asm_annotation.AsmMethodReplace;
+import com.zhangyue.ireader.asm_annotation.sentry_privacy.AsmMethodOpcodes;
+import com.zhangyue.ireader.asm_annotation.sentry_privacy.AsmMethodReplace;
 
 import java.util.ArrayList;
 import java.util.List;
