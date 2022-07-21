@@ -31,6 +31,8 @@ class MethodReplaceItem {
 
     public int targetOpcode
 
+    public boolean willHook
+
 
     MethodReplaceItem(List<Object> annotationPair, MethodNode methodNode, String owner) {
         replaceOpcode = Opcodes.INVOKESTATIC
@@ -49,6 +51,8 @@ class MethodReplaceItem {
                 targetMethod = value
             } else if (key == "targetDesc") {
                 targetDesc = value
+            }else if(key == "hook"){
+                willHook = value
             }
         }
         Logger.info("=====targetOpcode:${targetOpcode},targetOwner:${targetOwner} , replaceDesc${replaceDesc}")

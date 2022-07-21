@@ -32,8 +32,6 @@ class PluginEntry implements Plugin<Project> {
         Logger.info("debug:: ${PrivacyGlobalConfig.isDebug}")
         PrivacyGlobalConfig.setHandleAnnotationName(CommonUtil.formatName(project.privacy_plugin_config.handle_annotation_desc))
         Logger.info("handle_annotation_desc:: ${PrivacyGlobalConfig.handleAnnotationName}")
-        PrivacyGlobalConfig.setShouldInject(project.privacy_plugin_config.inject)
-        Logger.info("should_inject:: ${PrivacyGlobalConfig.shouldInject}")
         PrivacyGlobalConfig.setExclude(project.privacy_plugin_config.exclude)
         Logger.info("exclude:: ${PrivacyGlobalConfig.exclude}")
         PrivacyGlobalConfig.recordOwner = project.privacy_plugin_config.recordOwner

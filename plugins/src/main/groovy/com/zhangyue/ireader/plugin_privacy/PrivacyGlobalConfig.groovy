@@ -16,7 +16,6 @@ class PrivacyGlobalConfig {
 
     public static String handleAnnotationName
 
-    public static boolean shouldInject
 
     public static String recordOwner
     public static String recordMethod
@@ -41,13 +40,6 @@ class PrivacyGlobalConfig {
         isDebug = debug
     }
 
-    static boolean getShouldInject() {
-        return shouldInject
-    }
-
-    static void setShouldInject(boolean inject) {
-        shouldInject = inject
-    }
 
     static void setHandleAnnotationName(String name) {
         handleAnnotationName = name

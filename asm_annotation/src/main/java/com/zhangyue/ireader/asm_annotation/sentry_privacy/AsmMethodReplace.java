@@ -36,4 +36,9 @@ public @interface AsmMethodReplace {
      */
     String targetDesc() default "";
 
+    /**
+     * 是否进行 hook
+     */
+    boolean hook() default false;
+
 }

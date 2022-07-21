@@ -6,7 +6,6 @@ import com.zhangyue.ireader.plugin_privacy.PrivacyGlobalConfig
 import com.zhangyue.ireader.plugin_privacy.asmItem.MethodReplaceItem
 import com.zhangyue.ireader.util.CommonUtil
 import com.zhangyue.ireader.util.Logger
-import jdk.internal.org.objectweb.asm.tree.analysis.Value
 import org.gradle.api.Project
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
@@ -20,6 +19,7 @@ import org.objectweb.asm.tree.LdcInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.TypeInsnNode
+
 
 /**
  * 替换隐私合规相关方法 transform
@@ -40,29 +40,30 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
     byte[] hookClassInner(String className, byte[] bytes) {
         Logger.info("${getName()} modifyClassInner--------------->")
         def findHookPoint = false
-        def inject = PrivacyGlobalConfig.shouldInject
         Map<MethodNode, InsertInsnPoint> collectMap = new HashMap<>()
         ClassReader cr = new ClassReader(bytes)
         ClassNode classNode = new ClassNode()
         cr.accept(classNode, ClassReader.EXPAND_FRAMES)
         classNode.methods.each { methodNode ->
-            if (!isFilterMethod(cr.className, methodNode)) {
+            if (isNotHookMethod(cr.className, methodNode)) {
                 methodNode.instructions.each { insnNode ->
                     def methodReplaceItem = searchHookPoint(insnNode)
                     if (methodReplaceItem != null) {
+                        def inject = methodReplaceItem.willHook
                         logHookPoint(classNode.name, methodReplaceItem, methodNode, insnNode.opcode, insnNode.owner, insnNode.name, insnNode.desc, inject)
                         if (inject) {
                             //hook
                             injectInsn(insnNode, methodReplaceItem)
                         }
-                        collectInsertInsn(insnNode, methodNode, classNode, collectMap)
+                        //收集调用隐私方法的堆栈
+                        collectInsertInsn(insnNode, methodNode, classNode, collectMap,inject)
                         findHookPoint = true
                     }
                 }
             }
         }
         if (!collectMap.isEmpty() && findHookPoint) {
-            //插入写文件指令
+            //插入写文件指令，用来展示堆栈信息
             collectMap.each { key, value ->
                 key.instructions.insertBefore(value.hookInsnNode, value.instList)
             }
@@ -75,13 +76,19 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
         return bytes
     }
 
-    static boolean isFilterMethod(String className, MethodNode methodNode) {
+    /**
+     * 不是用来 hook 的方法
+     */
+    static boolean isNotHookMethod(String className, MethodNode methodNode) {
         MethodNode findNode = PrivacyGlobalConfig.filterMethod.find { key, Value ->
             (key == className
                     && it.name == methodNode.name
                     && it.desc == methodNode.desc
                     && it.access == methodNode.access)
 
+        }
+        if (findNode != null) {
+            println "过滤用来 hook 的方法${className} -> ${methodNode.name} -> ${methodNode.desc}"
         }
         return findNode == null
     }
@@ -204,7 +211,7 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
      * @param classNode
      * @param collectMap
      */
-    static void collectInsertInsn(insnNode, methodNode, classNode, collectMap) {
+    static void collectInsertInsn(insnNode, methodNode, classNode, collectMap, Inject) {
         def className = classNode.name
         def methodName = methodNode.name
         def methodDesc = methodNode.desc

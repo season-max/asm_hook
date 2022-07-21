@@ -56,7 +56,6 @@ public class PrivacyConfig {
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean checkAgreePrivacy(String name) {
         if (!isAgreePrivacyDialog) {
-            //打印堆栈
             Log.d(TAG, "未同意隐私权限-" + name);
         }
         return isAgreePrivacyDialog;
@@ -64,7 +63,7 @@ public class PrivacyConfig {
 
     @SuppressLint("HardwareIds")
     @AsmMethodReplace(targetMethodOpcode = OPCODE_INVOKEVIRTUAL
-            , targetClass = CLASS_NAME_TELEPHONYMANAGER)
+            , targetClass = CLASS_NAME_TELEPHONYMANAGER,hook = true)
     public static String getDeviceId(TelephonyManager telephonyManager) {
         if (!checkAgreePrivacy("getDeviceId")) {
             Log.e(TAG, TIP);
@@ -80,7 +79,7 @@ public class PrivacyConfig {
     @SuppressLint("HardwareIds")
     @RequiresApi(api = Build.VERSION_CODES.M)
     @AsmMethodReplace(targetMethodOpcode = OPCODE_INVOKEVIRTUAL
-            , targetClass = CLASS_NAME_TELEPHONYMANAGER)
+            , targetClass = CLASS_NAME_TELEPHONYMANAGER,hook = true)
     public static String getDeviceId(TelephonyManager telephonyManager, int index) {
         if (!checkAgreePrivacy("getDeviceId")) {
             Log.e(TAG, TIP);
@@ -96,7 +95,7 @@ public class PrivacyConfig {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @AsmMethodReplace(targetMethodOpcode = OPCODE_INVOKEVIRTUAL
-            , targetClass = CLASS_NAME_TELEPHONYMANAGER)
+            , targetClass = CLASS_NAME_TELEPHONYMANAGER,hook = true)
     public static String getImei(TelephonyManager telephonyManager) {
         if (!checkAgreePrivacy("getImei")) {
             Log.e(TAG, TIP);
@@ -111,7 +110,7 @@ public class PrivacyConfig {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @AsmMethodReplace(targetMethodOpcode = OPCODE_INVOKEVIRTUAL
-            , targetClass = CLASS_NAME_TELEPHONYMANAGER)
+            , targetClass = CLASS_NAME_TELEPHONYMANAGER,hook = true)
     public static String getImei(TelephonyManager telephonyManager, int index) {
         if (!checkAgreePrivacy("getImei")) {
             Log.e(TAG, TIP);
@@ -126,7 +125,7 @@ public class PrivacyConfig {
 
     @SuppressLint("HardwareIds")
     @AsmMethodReplace(targetMethodOpcode = OPCODE_INVOKEVIRTUAL
-            , targetClass = CLASS_NAME_TELEPHONYMANAGER)
+            , targetClass = CLASS_NAME_TELEPHONYMANAGER,hook = true)
     public static String getSimSerialNumber(TelephonyManager telephonyManager) {
         if (!checkAgreePrivacy("getSimSerialNumber")) {
             Log.e(TAG, TIP);

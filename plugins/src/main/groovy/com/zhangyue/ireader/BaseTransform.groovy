@@ -298,7 +298,6 @@ abstract class BaseTransform extends Transform {
         println '##########                 插件配置参数                         '
         println '##########                                                    '
         println '##########                -isDebug: ' + PrivacyGlobalConfig.isDebug
-        println '##########                -inject: ' + PrivacyGlobalConfig.shouldInject
         println '##########                -handleAnnotationName: ' + PrivacyGlobalConfig.handleAnnotationName
         println '##########                -exclude: ' + PrivacyGlobalConfig.exclude
         println '##########                                                    '
