@@ -39,7 +39,7 @@ apply plugin: 'maven-publish'
 ext {
     plugin_groupId = 'com.sason-max.gradle'
     plugin_artifactId = 'plugins'
-    plugin_version = '1.0.2'
+    plugin_version = '1.0.5'
     local = true
     release = true
 }
