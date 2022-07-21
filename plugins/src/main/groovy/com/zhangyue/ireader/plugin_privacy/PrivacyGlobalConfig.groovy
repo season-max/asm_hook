@@ -1,16 +1,12 @@
 package com.zhangyue.ireader.plugin_privacy
 
 import com.zhangyue.ireader.plugin_privacy.asmItem.MethodReplaceItem
-import org.objectweb.asm.tree.MethodNode
 
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.LinkedBlockingQueue
 
 class PrivacyGlobalConfig {
 
     public static final Queue<MethodReplaceItem> methodReplaceItemList = new LinkedBlockingQueue<>()
-
-    public static Map<String, MethodNode> filterMethod = new ConcurrentHashMap<>()
 
     public static boolean isDebug = false
 

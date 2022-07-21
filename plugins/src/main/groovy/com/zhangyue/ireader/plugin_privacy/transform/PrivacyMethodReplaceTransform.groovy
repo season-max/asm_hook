@@ -56,7 +56,7 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
                             injectInsn(insnNode, methodReplaceItem)
                         }
                         //收集调用隐私方法的堆栈
-                        collectInsertInsn(insnNode, methodNode, classNode, collectMap,inject)
+                        collectInsertInsn(insnNode, methodNode, classNode, collectMap, inject)
                         findHookPoint = true
                     }
                 }
@@ -65,7 +65,7 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
         if (!collectMap.isEmpty() && findHookPoint) {
             //插入写文件指令，用来展示堆栈信息
             collectMap.each { key, value ->
-                key.instructions.insertBefore(value.hookInsnNode, value.instList)
+                key.instructions.insert(value.hookInsnNode, value.instList)
             }
             //插入 writeToFile 方法
             ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS)
@@ -77,18 +77,19 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
     }
 
     /**
-     * 不是用来 hook 的方法
+     * 过滤有注解的用来 hook 的方法
      */
     static boolean isNotHookMethod(String className, MethodNode methodNode) {
-        MethodNode findNode = PrivacyGlobalConfig.filterMethod.find { key, Value ->
-            (key == className
-                    && it.name == methodNode.name
-                    && it.desc == methodNode.desc
-                    && it.access == methodNode.access)
-
-        }
-        if (findNode != null) {
-            println "过滤用来 hook 的方法${className} -> ${methodNode.name} -> ${methodNode.desc}"
+        def findNode = null
+        methodNode.invisibleAnnotations.find { anno ->
+            if (anno.desc == PrivacyGlobalConfig.getHandleAnnotationName()) {
+                findNode = anno
+                println "过滤方法${className} -> ${methodNode.name} -> ${methodNode.desc}"
+                //break looping
+                return true
+            }
+            //continue looping
+            return false
         }
         return findNode == null
     }

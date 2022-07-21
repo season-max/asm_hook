@@ -54,7 +54,6 @@ class AnnotationParserTransform extends BaseTransform {
         Logger.info("annotation values : ${values}")
         MethodReplaceItem item = new MethodReplaceItem(values, methodNode, CommonUtil.fileSeparatorName(className))
         PrivacyGlobalConfig.methodReplaceItemList.offer(item)
-        PrivacyGlobalConfig.filterMethod.put(className, methodNode)
         Logger.info("collectPrivacyMethod success: ${item}")
         println("collectPrivacyMethod success: ${item}")
     }
