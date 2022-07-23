@@ -9,7 +9,7 @@ public class DoubleClickConfig {
 
     private static long sLastCLickTime;
 
-    public static boolean inDoubleClick(View view, long duration) {
+    public static boolean inDoubleClick(Object view, long duration) {
         long now = System.currentTimeMillis();
         boolean in = sLastCLickTime != 0 && (now - sLastCLickTime) <= duration;
         sLastCLickTime = now;

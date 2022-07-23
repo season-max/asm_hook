@@ -14,8 +14,11 @@ class DoubleClickConfig {
      */
     public static String doubleClickCheckClass = CommonUtil.fileSeparatorName("com.zhangyue.ireader.toolslibrary.doubleclick.DoubleClickConfig")
     public static String doubleClickCheckMethod = "inDoubleClick"
-    public static String doubleClickCheckMethodDesc = "(Landroid/view/View;J)Z"
+    public static String doubleClickCheckMethodDesc = "(Ljava/lang/Object;J)Z"
+    public static int doubleClickCheckDuration = 800
 
+    public static String clickLambdaName = "onClick"
+    public static String clickLambdaInterfaces = "Landroid/view/View\$OnClickListener;"
 
     String checkAnnotation
 
