@@ -8,7 +8,7 @@ class CommonUtil {
         return pathName.replace(File.separator, ".").replace(".class", "")
     }
 
-    static String fileSeparatorName(String name) {
+    static String getClassInternalName(String name) {
         return name.replace(".", File.separator)
     }
 

@@ -2,6 +2,7 @@ package com.zhangyue.ireader.toolslibrary.handleThread;
 
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,7 +19,7 @@ public class OptimizeThread extends Thread {
     }
 
     private static String generateName(String name, String className) {
-        return className + "_" + threadNumber.getAndIncrement() + (TextUtils.isEmpty(name) ? "" : name);
+        return className + "_" + threadNumber.getAndIncrement() + (TextUtils.isEmpty(name) ? "" : ("_" + name));
     }
 
     public OptimizeThread(String className) {
@@ -31,5 +32,13 @@ public class OptimizeThread extends Thread {
 
     public OptimizeThread(String name, String className) {
         this(null, name, className);
+    }
+
+    public OptimizeThread(@Nullable ThreadGroup group, @Nullable Runnable target, @NonNull String name, long stackSize) {
+        super(group, target, name, stackSize);
+    }
+
+    public OptimizeThread() {
+        super();
     }
 }

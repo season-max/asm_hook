@@ -12,6 +12,6 @@ public class MyThread_2 extends Thread{
     @Override
     public void run() {
         super.run();
-        Log.i("TAG", "77777");
+        Log.i("HandleThreadActivity", "77777");
     }
 }

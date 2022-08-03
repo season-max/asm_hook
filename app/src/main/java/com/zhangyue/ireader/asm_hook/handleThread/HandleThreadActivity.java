@@ -10,13 +10,20 @@ import com.zhangyue.ireader.asm_hook.R;
 
 public class HandleThreadActivity extends AppCompatActivity {
 
+    public static final String TAG = "HandleThreadActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_handle_thread);
 
 
-        Runnable runnable = () -> Log.i("TAG", "11111");
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "1111 -> " + Thread.currentThread().getName());
+            }
+        };
 
         new Thread(runnable).start();
 
@@ -26,29 +33,29 @@ public class HandleThreadActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.i("TAG", "3333");
+                Log.i(TAG, "3333 -> " + Thread.currentThread().getName());
             }
         }).start();
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.i("TAG", "444444");
+                Log.i(TAG, "444444 ->" + Thread.currentThread().getName());
             }
-        },"thread-44444");
+        }, "thread-44444").start();
 
         new Thread() {
             @Override
             public void run() {
                 super.run();
-                Log.i("TAG", "22222");
+                Log.i(TAG, "22222 -> :" + Thread.currentThread().getName());
             }
         }.start();
 
         new Thread("thrad-55555") {
             @Override
             public void run() {
-                Log.i("TAG", "55555");
+                Log.i(TAG, "55555 -> :" + Thread.currentThread().getName());
             }
         }.start();
 
@@ -57,7 +64,7 @@ public class HandleThreadActivity extends AppCompatActivity {
         new MyThread_2("mythread_222").start();
     }
 
-    static class MyThread extends Thread{
+    static class MyThread extends Thread {
 
         public MyThread(@NonNull String name) {
             super(name);
@@ -66,7 +73,7 @@ public class HandleThreadActivity extends AppCompatActivity {
         @Override
         public void run() {
             super.run();
-            Log.i("TAG", "6666");
+            Log.i(TAG, "6666 -> currentThread;:" + Thread.currentThread().getName());
         }
     }
 }

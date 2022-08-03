@@ -194,7 +194,7 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
         methodVisitor.visitVarInsn(Opcodes.ALOAD, 4)
         methodVisitor.visitMethodInsn(
                 Opcodes.INVOKESTATIC,
-                CommonUtil.fileSeparatorName(PrivacyGlobalConfig.recordOwner),
+                CommonUtil.getClassInternalName(PrivacyGlobalConfig.recordOwner),
                 PrivacyGlobalConfig.recordMethod,
                 PrivacyGlobalConfig.recordDesc,
                 false

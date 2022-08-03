@@ -21,6 +21,12 @@ plugins {
 //    annotationName = 'checkClick'
 //}
 
+apply plugin: 'optimize_thread'
+handle_thread_config {
+    turnOn = true
+    handleThreadClass = 'com.zhangyue.ireader.toolslibrary.handleThread.OptimizeThread'
+}
+
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion

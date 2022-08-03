@@ -12,7 +12,7 @@ class DoubleClickConfig {
     /**
      * 处理快速点击的工具类
      */
-    public static String doubleClickCheckClass = CommonUtil.fileSeparatorName("com.zhangyue.ireader.toolslibrary.doubleclick.DoubleClickConfig")
+    public static String doubleClickCheckClass = CommonUtil.getClassInternalName("com.zhangyue.ireader.toolslibrary.doubleclick.DoubleClickConfig")
     public static String doubleClickCheckMethod = "inDoubleClick"
     public static String doubleClickCheckMethodDesc = "(Ljava/lang/Object;J)Z"
     public static int doubleClickCheckDuration = 800
