@@ -1,10 +1,8 @@
 package com.zhangyue.ireader.toolslibrary;
 
-import android.content.Context;
-
 public class ConfigGlobal {
 
-    private Context context;
+    private String mStoreDirectory;
 
     private static class Holder {
         private static final ConfigGlobal mInstance = new ConfigGlobal();
@@ -18,12 +16,12 @@ public class ConfigGlobal {
         return Holder.mInstance;
     }
 
-    public void setContext(Context context) {
-        this.context = context;
+
+    public void setStoreDirectory(String path) {
+        this.mStoreDirectory = path;
     }
 
-    public Context getContext() {
-        return this.context;
+    public String getStoreDirectory() {
+        return mStoreDirectory;
     }
-
 }

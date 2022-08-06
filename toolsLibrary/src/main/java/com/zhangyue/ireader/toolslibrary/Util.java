@@ -47,7 +47,7 @@ public class Util {
 
     public static void writeToFile(String log) {
         String today = SIMPLE_DATE_FORMAT.format(new Date(System.currentTimeMillis()));
-        File file = new File(ConfigGlobal.getInstance().getContext().getExternalCacheDir(), "privacy_log.txt");
+        File file = new File(ConfigGlobal.getInstance().getStoreDirectory(), "privacy_log.txt");
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(today);
         stringBuilder.append("\r\n");
