@@ -4,16 +4,19 @@ apply from: 'config.gradle'
 buildscript {
     repositories {
         google()
-        jcenter()
         mavenCentral()
-        maven {
-            url uri('./repo')
-        }
+//        maven {
+//            url uri('../repo')
+//        }
+        maven { url 'https://jitpack.io' }
+        maven { url "https://plugins.gradle.org/m2/" }
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.4'
-        classpath 'com.sason-max.gradle:plugins:1.0.5'
+//        classpath 'com.sason-max.gradle:plugins:1.0.5'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
+//        classpath 'gradle.plugin.com.sason-max.gradle:plugins:1.0.6'
     }
 
 }
@@ -23,7 +26,8 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        jcenter()
+        maven { url 'https://jitpack.io' }
+        maven { url "https://plugins.gradle.org/m2/" }
     }
 }
 

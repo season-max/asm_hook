@@ -1,6 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'groovy'
-//apply from : '../upload_plugin.gradle'
+apply plugin: 'maven'
+apply plugin: "com.gradle.plugin-publish"
 sourceSets {
     main {
         java {
@@ -23,7 +24,7 @@ dependencies {
     implementation localGroovy()
     implementation 'org.ow2.asm:asm:9.2'
     implementation 'org.ow2.asm:asm-commons:9.2'
-    implementation 'com.android.tools.build:gradle:3.5.4'
+    implementation 'com.android.tools.build:gradle:3.6.4'
 }
 
 java {
@@ -32,7 +33,6 @@ java {
 }
 
 
-apply plugin: "com.gradle.plugin-publish"
 buildscript {
     repositories {
         maven {
@@ -45,8 +45,8 @@ buildscript {
     }
 }
 
-group = 'com.sason-max.gradle'
-version = '1.0.6'
+group = 'com.sason-max.gradle' //插件的群组，插件的classpath会用到
+version = '1.0.6'   //配置插件的版本号
 
 pluginBundle {
     website = 'https://github.com/season-max/asm_hook'
