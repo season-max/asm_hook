@@ -48,27 +48,27 @@ buildscript {
 }
 
 apply plugin: "com.gradle.plugin-publish"
-group = 'com.sason-max.gradle' //插件的群组，插件的classpath会用到
-version = '1.0.6'   //配置插件的版本号
+group = 'io.github.season-max' //插件的群组，插件的classpath会用到
+version = '0.9'   //配置插件的版本号
 //
 pluginBundle {
     website = 'https://github.com/season-max/asm_hook'
-    vcsUrl = 'https://github.com/season-max/asm_hook.git'
-    description = 'privacy check(隐私合规检测)'  //插件描述
-    tags = ['asm', 'plugin', 'privacy check', 'thread check']  //插件的tag。可以通过这个在插件门户上搜索
+    vcsUrl = 'https://github.com/season-max/asm_hook'
+    description = 'plugins write by asm'  //插件描述
+    tags = ['asm', 'plugin', 'compliance check', 'thread check']  //插件的tag。可以通过这个在插件门户上搜索
 
     pluginTags = [
-            privacyPlugin: ['individual', 'privacy check'],
+            privacyPlugin: ['individual', 'compliance check'],
     ]
 }
 
 gradlePlugin {
     plugins {
         privacyPlugin {
-            id = 'com.sason-max.gradle.privacy'
+            id = 'io.github.season-max.privacycheck'
             implementationClass = 'com.zhangyue.ireader.plugin_privacy.PluginEntry'
-            displayName = 'privacy plugin'
-            description = 'Gradle plugin to check privacy!'
+            displayName = 'privacy check plugin'
+            description = 'gradle plugin for compliance check'
         }
     }
 }

@@ -10,7 +10,7 @@ public class MyApplication extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
-        ConfigGlobal.getInstance().setStoreDirectory(base.getExternalCacheDir().getAbsolutePath());)
+        ConfigGlobal.getInstance().setStoreDirectory(base.getExternalCacheDir().getAbsolutePath());
     }
 
     @Override

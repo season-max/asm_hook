@@ -62,7 +62,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
-    implementation 'com.github.season-max:asm_hook:v_0.98'
-//    implementation project(':toolsLibrary')
-//    implementation project(':asm_annotation')
+//    implementation 'com.github.season-max:asm_hook:v_0.98'
+    implementation project(':toolsLibrary')
+    implementation project(':asm_annotation')
 }
