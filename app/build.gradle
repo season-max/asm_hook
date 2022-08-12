@@ -63,5 +63,5 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     implementation project(':toolsLibrary')
-//    implementation 'com.github.season-max:toolslibrary:v_0.99'
+//    implementation 'com.github.season-max:asm_hook:v_1.0'
 }

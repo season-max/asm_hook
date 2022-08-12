@@ -60,24 +60,7 @@ dependencies {
 //    implementation 'com.android.support:appcompat-v7:28.0.0'
 }
 
-apply plugin :'maven-publish'
+apply plugin: 'com.github.dcendents.android-maven'
 
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                // 配置组件的 GAV
-                groupId = 'com.github.season-max'
-                artifactId = 'toolslibrary'
-                version = '1.0'
-                artifact 'build/outputs/aar/toolsLibrary-debug.aar'
-            }
-        }
-        repositories {
-            maven {
-                // 指明组件发布到项目工程的 /build/repo 目录
-                url = "../build/repo"
-            }
-        }
-    }
-}
+group = 'com.github.season-max'
+
