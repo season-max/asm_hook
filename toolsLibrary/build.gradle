@@ -66,11 +66,11 @@ afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
-                from components.release
                 // 配置组件的 GAV
                 groupId = 'com.github.season-max'
                 artifactId = 'toolslibrary'
                 version = '1.0'
+                artifact 'build/outputs/aar/toolsLibrary-debug.aar'
             }
         }
         repositories {
