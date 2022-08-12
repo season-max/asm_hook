@@ -78,7 +78,7 @@ buildscript {
 apply plugin: 'maven-publish'
 
 ext {
-    plugin_groupId = 'com.sason-max.gradle'
+    plugin_groupId = 'com.season-max.gradle'
     plugin_artifactId = 'plugins'
     plugin_version = '1.0.5'
     local = true //true-上传到本地  false-上传到笔者的 github package（接入方无法使用）

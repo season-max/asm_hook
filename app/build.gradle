@@ -3,16 +3,16 @@ plugins {
 }
 
 ////隐私合规
-//apply plugin: 'privacy.track'
-//privacy_plugin_config {
-//    isDebug = false
-//    handle_annotation_desc = 'com.zhangyue.ireader.asm_annotation.sentry_privacy.AsmMethodReplace'
-//    inject = false
-//    exclude = ['android.support', 'androidx']
-//    recordOwner = "com.zhangyue.ireader.toolslibrary.Util"
-//    recordMethod = "writeToFile"
-//    recordDesc = "(Ljava/lang/String;)V"
-//}
+apply plugin: 'privacy.track'
+privacy_plugin_config {
+    isDebug = false
+    handle_annotation_desc = 'com.zhangyue.ireader.asm_annotation.sentry_privacy.AsmMethodReplace'
+    inject = false
+    exclude = ['android.support', 'androidx']
+    recordOwner = "com.zhangyue.ireader.toolslibrary.Util"
+    recordMethod = "writeToFile"
+    recordDesc = "(Ljava/lang/String;)V"
+}
 //
 ////双击防抖
 //apply plugin: 'doubleclick_check'

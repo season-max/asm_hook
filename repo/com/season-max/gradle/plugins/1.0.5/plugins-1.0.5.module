@@ -1,0 +1,84 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.season-max.gradle",
+    "module": "plugins",
+    "version": "1.0.5",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "6.2",
+      "buildId": "h2im5nj3jvhslbgwucro6khyhu"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 7,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "plugins-1.0.5.jar",
+          "url": "plugins-1.0.5.jar",
+          "size": 121100,
+          "sha512": "ef585e5f4d6e6a0fc3a4c3c32f9041b4724dff617a677b85f49483c7e0d18dbde87341f0a4c9aabd60281f3230852791f755a53db80d56e94d3315bd1507aeb8",
+          "sha256": "778a293e25124312c01df344953ba95918fb2fda028c7b9a68b9896e274fb62c",
+          "sha1": "0c21824f803f19f320b53e90f787105e404f2aff",
+          "md5": "7b99cc83d95baa6dcbb1f097b0979fc0"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 7,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.ow2.asm",
+          "module": "asm",
+          "version": {
+            "requires": "9.2"
+          }
+        },
+        {
+          "group": "org.ow2.asm",
+          "module": "asm-commons",
+          "version": {
+            "requires": "9.2"
+          }
+        },
+        {
+          "group": "com.android.tools.build",
+          "module": "gradle",
+          "version": {
+            "requires": "3.6.4"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "plugins-1.0.5.jar",
+          "url": "plugins-1.0.5.jar",
+          "size": 121100,
+          "sha512": "ef585e5f4d6e6a0fc3a4c3c32f9041b4724dff617a677b85f49483c7e0d18dbde87341f0a4c9aabd60281f3230852791f755a53db80d56e94d3315bd1507aeb8",
+          "sha256": "778a293e25124312c01df344953ba95918fb2fda028c7b9a68b9896e274fb62c",
+          "sha1": "0c21824f803f19f320b53e90f787105e404f2aff",
+          "md5": "7b99cc83d95baa6dcbb1f097b0979fc0"
+        }
+      ]
+    }
+  ]
+}
