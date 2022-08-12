@@ -4,15 +4,15 @@ apply plugin: 'maven'
 sourceSets {
     main {
         java {
-            srcDir '../plugin_privacy/src/main/java'
+            srcDir '../plugins/src/main/java'
         }
 
         groovy {
-            srcDir '../plugin_privacy/src/main/groovy'
+            srcDir '../plugins/src/main/groovy'
         }
 
         resources {
-            srcDir '../plugin_privacy/src/main/resources'
+            srcDir '../plugins/src/main/resources'
         }
     }
 }

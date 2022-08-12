@@ -4,6 +4,7 @@
     <bytecodeTargetLevel target="1.7">
       <module name="asm_hook.app" target="1.8" />
       <module name="asm_hook.toolsLibrary" target="1.8" />
+      <module name="asm_hook.toolsLibrary.main" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
