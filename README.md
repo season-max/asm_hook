@@ -1,42 +1,63 @@
 # plugin_privacy : 扫描隐私合规相关的方法调用并 hook
 
-
-
 ## 使用方式
 
-1. 在 **toolsLibrary ** moudle中，通过 assembleDebug 打出 aar，将 aar 拷贝到你需要使用的项目中，并依赖。该项目中主要提供了 hook 隐私合规相关方法的工具类及提供写入文件的工具类。需要在 application 中的 attachBaseContext 时注册 context。
+### 引入工具类
 
-   ```java
+有两种方式引入。
+
+- 将项目 download 之后，在 **toolsLibrary** moudle中，打出 aar，将 aar 拷贝到你需要使用的项目中，并依赖。
+- 通过远程依赖的方式引入。 根目录 build.gradle 添加
+    ```
+    allprojects {
+        repositories {
+            ...
+            maven { url 'https://jitpack.io' }
+        }
+    }
+   ```
+  项目 build.gradle 引入依赖
+    ```
+    dependencies {
+	        implementation 'com.github.season-max:asm_hook:1.1'
+	}
+   ```
+
+工具类主要提供了 hook 隐私合规相关方法的工具类及提供写入文件的工具类。需要在 application 中的 attachBaseContext 时传入文件路径（或者在调用隐私合规方法之前），用来记录调用合规方法的堆栈信息。
+   ```
     @Override
        protected void attachBaseContext(Context base) {
            super.attachBaseContext(base);
-           ConfigGlobal.getInstance().setContext(this);
+           ConfigGlobal.getInstance().setStoreDirectory(base.getExternalCacheDir().getAbsolutePath());
        }
    ```
 
-   
+### 接入插件
+1.在你的根项目中添加依赖。有两种方式，一是添加远程依赖
 
-2. 在你的根项目中添加依赖。有两种方式，一是添加远程依赖
+   ```
+   buildscript {
+    repositories {
 
-   ```groovy
-   maven { url 'https://maven.pkg.github.com/season-max/asm_hook'
-               credentials {
-                   // 用户名和token
-                   username = season-max
-                   password = my_token
-               }
-           }
+        maven {
+            url 'https://maven.pkg.github.com/season-max/asm_hook'
+            credentials {
+                // 用户名和token
+                username = 'season-max'
+                password = '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'
+            }
+        }
    ```
 
-   ```groovy
-   classpath 'com.sason-max.gradle.plugins:plugin_privacy:1.0.0'
+   ```
+   classpath 'com.sason-max.gradle:plugins:1.0.5'
    ```
 
-   token 可以发送邮件到 seasonsnoe@gmail.com 申请。
+   token 无效的话，可以发送邮件到 seasonsnoe@gmail.com 申请。
 
-   二是将插件项目的仓库倒入本地 repo 中依赖
+   二是将插件项目的仓库倒入本地 repo 中依赖。笔者建议第二种方式接入，每个项目的生产环境不同，可以针对自己的项目做修改。
 
-3. 在 module 的 **build.gradle**中添加
+2.在 module 的 **build.gradle**中添加
 
    ```
    //隐私合规
@@ -56,12 +77,13 @@
    
    ```
 
-4. 项目编译时会扫描所有的方法，在根目录下生成 **replaceInsn.txt** 文件，记录隐私合规相关方法的位置。在项目运行期间会在 **getExternalCacheDir()** 目录下生成记录调用隐私合规方法的调用栈。
-
-
+4. 项目编译时会扫描所有的方法，在根目录下生成 **replaceInsn.txt** 文件，记录隐私合规相关方法的位置。在项目运行期间会在 **getExternalCacheDir()**
+   目录下生成记录调用隐私合规方法的调用栈。
 
 ## 实现思路
 
 1. 定义**AsmMethodReplace**注解，用来标记想要 hook 的隐私合规的相关方法。
-2. 在 **AnnotationParserTransform.groovy** 中扫描项目，将含有配置注解的方法指令记录下来，包括调用方法指令的 **opcode**、**owner**、**name**、**descriptor**
-3. 在**PrivacyMethodReplaceTransform.groovy** 中，在和记录下来的注解指令匹配的方法指令前插入写文件方法，用来在运行时记录在文件中，同时将包含隐私合规方法的类和调用方法也写入文件中，存储在项目的根目录下。
+2. 在 **AnnotationParserTransform.groovy** 中扫描项目，将含有配置注解的方法指令记录下来，包括调用方法指令的 **opcode**、**owner**、**
+   name**、**descriptor**
+3. 在**PrivacyMethodReplaceTransform.groovy**
+   中，在和记录下来的注解指令匹配的方法指令前插入写文件方法，用来在运行时记录在文件中，同时将包含隐私合规方法的类和调用方法也写入文件中，存储在项目的根目录下。
