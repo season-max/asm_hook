@@ -47,31 +47,31 @@ buildscript {
     }
 }
 //-----------上传到 gradle 门户----------
-apply plugin: "com.gradle.plugin-publish"
-group = 'io.github.season-max' //插件的群组，插件的classpath会用到
-version = '0.9'   //配置插件的版本号
+//apply plugin: "com.gradle.plugin-publish"
+//group = 'io.github.season-max' //插件的群组，插件的classpath会用到
+//version = '0.9'   //配置插件的版本号
+////
+//pluginBundle {
+//    website = 'https://github.com/season-max/asm_hook'
+//    vcsUrl = 'https://github.com/season-max/asm_hook'
+//    description = 'plugins write by asm'  //插件描述
+//    tags = ['asm', 'plugin', 'compliance check', 'thread check']  //插件的tag。可以通过这个在插件门户上搜索
 //
-pluginBundle {
-    website = 'https://github.com/season-max/asm_hook'
-    vcsUrl = 'https://github.com/season-max/asm_hook'
-    description = 'plugins write by asm'  //插件描述
-    tags = ['asm', 'plugin', 'compliance check', 'thread check']  //插件的tag。可以通过这个在插件门户上搜索
-
-    pluginTags = [
-            privacyPlugin: ['individual', 'compliance check'],
-    ]
-}
-
-gradlePlugin {
-    plugins {
-        privacyPlugin {
-            id = 'io.github.season-max.privacycheck'
-            implementationClass = 'com.zhangyue.ireader.plugin_privacy.PluginEntry'
-            displayName = 'privacy check plugin'
-            description = 'gradle plugin for compliance check'
-        }
-    }
-}
+//    pluginTags = [
+//            privacyPlugin: ['individual', 'compliance check'],
+//    ]
+//}
+//
+//gradlePlugin {
+//    plugins {
+//        privacyPlugin {
+//            id = 'io.github.season-max.privacycheck'
+//            implementationClass = 'com.zhangyue.ireader.plugin_privacy.PluginEntry'
+//            displayName = 'privacy check plugin'
+//            description = 'gradle plugin for compliance check'
+//        }
+//    }
+//}
 
 
 //------------------上传到 github package-----------
@@ -81,7 +81,7 @@ ext {
     plugin_groupId = 'com.sason-max.gradle'
     plugin_artifactId = 'plugins'
     plugin_version = '1.0.5'
-    local = false //true-上传到本地  false-上传到笔者的 github package（接入方无法使用）
+    local = true //true-上传到本地  false-上传到笔者的 github package（接入方无法使用）
 }
 
 def javadocJar = task("javadocJar", type: Jar, dependsOn: javadoc) {
