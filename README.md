@@ -3,26 +3,7 @@
 ## 使用方式
 
 ### 引入工具类
-
-有两种方式引入。
-
 - 将项目 download 之后，在 **toolsLibrary** moudle中，打出 aar，将 aar 拷贝到你需要使用的项目中，并依赖。
-- 通过远程依赖的方式引入。 根目录 build.gradle 添加
-    ```
-    allprojects {
-        repositories {
-            ...
-            maven { url 'https://jitpack.io' }
-        }
-    }
-   ```
-  项目 build.gradle 引入依赖
-    ```
-    dependencies {
-	        implementation 'com.github.season-max:asm_hook:1.1'
-	}
-   ```
-
 工具类主要提供了 hook 隐私合规相关方法的工具类及提供写入文件的工具类。需要在 application 中的 attachBaseContext 时传入文件路径（或者在调用隐私合规方法之前），用来记录调用合规方法的堆栈信息。
    ```
     @Override
