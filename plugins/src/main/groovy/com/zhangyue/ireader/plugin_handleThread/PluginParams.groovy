@@ -1,6 +1,8 @@
 package com.zhangyue.ireader.plugin_handleThread
 
-class HandleThreadConfig {
+class PluginParams {
+
+    boolean printLog
 
     boolean turnOn
 

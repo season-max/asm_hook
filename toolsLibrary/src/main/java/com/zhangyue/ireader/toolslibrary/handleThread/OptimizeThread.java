@@ -1,6 +1,7 @@
 package com.zhangyue.ireader.toolslibrary.handleThread;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,13 +25,16 @@ public class OptimizeThread extends Thread {
 
     public OptimizeThread(String className) {
         this(null, "", className);
+        Log.i("tag","2222");
     }
 
     public OptimizeThread(@Nullable Runnable target, String className) {
         this(target, "", className);
+        Log.i("tag","11111");
     }
 
     public OptimizeThread(String name, String className) {
         this(null, name, className);
+        Log.i("tag","3333");
     }
 }
