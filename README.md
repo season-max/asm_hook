@@ -19,7 +19,7 @@
 1.在你的根项目中添加依赖。有两种方式，一是添加远程依赖
 
    ```
-   ~~buildscript {~~
+   buildscript {
     repositories {
 
         maven {
