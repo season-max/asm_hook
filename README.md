@@ -37,20 +37,15 @@
 
    ```
    buildscript {
-    repositories {
-
+      repositories {
         maven {
-            url 'https://maven.pkg.github.com/season-max/asm_hook'
-            credentials {
-                // 用户名和token
-                username = 'season-max'
-                password = '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'
-            }
+          url "https://plugins.gradle.org/m2/"
         }
-   ```
-
-   ```
-   classpath 'com.sason-max.gradle:plugins:1.0.5'
+      }
+      dependencies {
+        classpath "io.github.season-max:plugins:0.9"
+      }
+}
    ```
 
    token 无效的话，可以发送邮件到 seasonsnoe@gmail.com 申请。
