@@ -17,7 +17,7 @@
 
 ### 接入插件
 1.在你的根项目中添加依赖。有两种方式，一是添加远程依赖
-
+~~
    ```
    buildscript {
     repositories {
@@ -35,7 +35,7 @@
    ```
    classpath 'com.sason-max.gradle:plugins:1.0.5'
    ```
-
+~~
    token 无效的话，可以发送邮件到 seasonsnoe@gmail.com 申请。
 
    二是将插件项目的仓库倒入本地 repo 中依赖。笔者建议第二种方式接入，每个项目的生产环境不同，可以针对自己的项目做修改。
