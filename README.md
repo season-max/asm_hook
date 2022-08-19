@@ -16,29 +16,24 @@
    ```
 
 ### 接入插件
-1.在你的根项目中添加依赖。有两种方式，一是添加远程依赖
+1.在你的根项目中添加依赖。有两种方式
+
+一是添加远程依赖
 
    ```
    buildscript {
-    repositories {
-
+      repositories {
         maven {
-            url 'https://maven.pkg.github.com/season-max/asm_hook'
-            credentials {
-                // 用户名和token
-                username = 'season-max'
-                password = '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'
-            }
+          url "https://plugins.gradle.org/m2/"
         }
+      }
+      dependencies {
+        classpath "io.github.season-max:plugins:0.9"
+      }
+}
    ```
 
-   ```
-   classpath 'com.sason-max.gradle:plugins:1.0.5'
-   ```
-
-   token 无效的话，可以发送邮件到 seasonsnoe@gmail.com 申请。
-
-   二是将插件项目的仓库倒入本地 repo 中依赖。笔者建议第二种方式接入，每个项目的生产环境不同，可以针对自己的项目做修改。
+二是将插件项目的仓库倒入本地 repo 中依赖。笔者建议第二种方式接入，每个项目的生产环境不同，可以针对自己的项目做修改。
 
 2.在 module 的 **build.gradle**中添加
 
