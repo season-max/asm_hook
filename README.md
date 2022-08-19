@@ -28,7 +28,7 @@
         }
       }
       dependencies {
-        classpath "io.github.season-max:plugins:0.9"
+        classpath "io.github.season-max:plugins:0.92"
       }
 }
    ```
