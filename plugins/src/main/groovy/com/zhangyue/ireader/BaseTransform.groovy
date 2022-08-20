@@ -2,7 +2,6 @@ package com.zhangyue.ireader
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
-import com.zhangyue.ireader.plugin_privacy.PrivacyGlobalConfig
 import com.zhangyue.ireader.util.CommonUtil
 import com.zhangyue.ireader.util.Logger
 import org.apache.commons.io.FileUtils
@@ -51,9 +50,6 @@ abstract class BaseTransform extends Transform {
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         super.transform(transformInvocation)
         println("transform start--------------->")
-        if (firstTransform()) {
-            printCopyRight()
-        }
         onTransformStart(transformInvocation)
         def startTime = System.currentTimeMillis()
         def inputs = transformInvocation.inputs
@@ -284,35 +280,9 @@ abstract class BaseTransform extends Transform {
         return classBytesCode
     }
 
-    /**
-     * 打印日志信息
-     */
-    static void printCopyRight() {
-        println()
-        println '#######################################################################'
-        println '##########                                                    '
-        println '##########                欢迎使用隐私合规处理插件'
-        println '##########                                                    '
-        println '#######################################################################'
-        println '##########                                                    '
-        println '##########                 插件配置参数                         '
-        println '##########                                                    '
-        println '##########                -isDebug: ' + PrivacyGlobalConfig.isDebug
-        println '##########                -handleAnnotationName: ' + PrivacyGlobalConfig.handleAnnotationName
-        println '##########                -exclude: ' + PrivacyGlobalConfig.exclude
-        println '##########                                                    '
-        println '##########                                                    '
-        println '##########                                                    '
-        println '#######################################################################'
-        println()
-    }
-
-    protected boolean firstTransform() {
-        return false
-    }
-
     boolean shouldHookClass(String className) {
-        def excludes = PrivacyGlobalConfig.exclude
+        //默认过滤 androidx、android.support
+        def excludes = ['android.support', 'androidx']
         if (excludes != null) {
             for (String string : excludes) {
                 if (className.startsWith(string)) {

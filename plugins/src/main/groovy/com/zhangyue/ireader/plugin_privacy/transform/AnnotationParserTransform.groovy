@@ -67,9 +67,4 @@ class AnnotationParserTransform extends BaseTransform {
     void onTransformEnd(TransformInvocation transformInvocation) {
         Logger.info("${getName()} end--------------->")
     }
-
-    @Override
-    protected boolean firstTransform() {
-        return true
-    }
 }
