@@ -15,7 +15,7 @@ public class OptimizeThread extends Thread {
     private static final AtomicInteger threadNumber = new AtomicInteger(0);
 
     private static String generateName(String name, String className) {
-        return className + "_" + threadNumber.getAndIncrement() + (TextUtils.isEmpty(name) ? "" : ("_" + name));
+        return "R_" + className + "_" + threadNumber.getAndIncrement() + (TextUtils.isEmpty(name) ? "" : ("_" + name));
     }
 
     public OptimizeThread(String className) {

@@ -27,13 +27,9 @@ class CollectThreadTransform extends BaseTransform {
         cr.accept(cn, 0)
         //收集 Thread 类型的匿名内部类，在下一个 transform 中将其更换成优化的线程类
         if (anonymousThreadClass(cn)) {
-            def outerClass = cn.name
-            def index = cn.name.lastIndexOf("\$")
-            if (index != -1) {
-                outerClass = outerClass.substring(0, index)
-            }
             cn.methods.each { methodNode ->
-                if (methodNode.name == "<init>" && methodNode.desc.contains(outerClass)) {
+                //有构造方法
+                if (methodNode.name == "<init>") {
                     Config.logger("匿名线程类 ${cn.name} 加入集合")
                     Config.anonymousThreadClassList.add(cn.name)
                 }
@@ -48,9 +44,15 @@ class CollectThreadTransform extends BaseTransform {
      * 判断是不是 Thread 类型的匿名内部类
      */
     static boolean anonymousThreadClass(cn) {
-        return (cn.name != Config.handleThreadClass
-                && cn.superName == Config.threadClass
-                && cn.name.indexOf("\$") > 0)
+        def name = cn.name
+        int index = name.lastIndexOf("\$")
+        if (index > 0) {
+            String lastChar = name.substring(index + 1)
+            return (name != Config.handleThreadClass
+                    && cn.superName == Config.threadClass
+                    && lastChar.isInteger())
+        }
+        return false
     }
 
     @Override
