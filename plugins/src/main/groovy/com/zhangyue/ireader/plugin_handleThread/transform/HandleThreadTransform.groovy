@@ -13,9 +13,29 @@ import org.objectweb.asm.Type
 import org.objectweb.asm.tree.*
 
 /**
- * hook 匿名线程，统一命名管理
+ * 线程处理 transform
  */
 class HandleThreadTransform extends BaseTransform {
+
+    /**
+     * 长度为 0 字符
+     */
+    public static final String MARK = "\u200B"
+
+    /**
+     * Thread class 的规范名称
+     */
+    final static String THREAD_CLASS = "java/lang/Thread"
+
+    /**
+     * 线程处理工具集合
+     */
+    // 包名
+    static String OPTIMIZE_THREAD_PACKAGE = "com/zhangyue/ireader/toolslibrary/optimizeThread/"
+    // 线程处理类
+    static String SHADOW_THREAD = OPTIMIZE_THREAD_PACKAGE + "ShadowThread"
+    // Executors 处理类
+    static String SHADOW_EXECUTORS = OPTIMIZE_THREAD_PACKAGE + "ShadowExecutors"
 
     HandleThreadTransform(Project project) {
         super(project)
@@ -31,88 +51,177 @@ class HandleThreadTransform extends BaseTransform {
         ClassReader cr = new ClassReader(bytes)
         ClassNode cn = new ClassNode(Opcodes.ASM9)
         cr.accept(cn, ClassReader.EXPAND_FRAMES)
-        //过滤掉匿名内部类，后面单独处理
-        if (!Config.anonymousThreadClassList.contains(cn.name)) {
-            //处理匿名线程对象 ｜｜ 记录位置
-            cn.methods.each { methodNode ->
-                methodNode.instructions.each { insnNode ->
-                    if (insnNode instanceof TypeInsnNode
-                            && insnNode.opcode == Opcodes.NEW) {
-                        def newThreadName = CommonUtil.path2ClassName(cn.name) + '_' + methodNode.name
-                        if (Config.threadClass == insnNode.desc) {
-                            //匿名线程对象
-                            Config.logger("要处理匿名线程 类 ${cn.name} --> 方法 ${methodNode.name} --->${insnNode.desc}")
-                            hookNewThread(methodNode, insnNode, newThreadName)
-                            recordPosition(cn, methodNode, false, "",newThreadName)
-                        } else if (Config.anonymousThreadClassList.contains(insnNode.desc)) {
-                            Config.logger("记录匿名线程类位置  ${cn.name} ---> ${methodNode.name}")
-                            recordPosition(cn, methodNode, true, insnNode.desc, newThreadName)
-                        }
-                    }
+        cn.methods.each { methodNode ->
+            methodNode.instructions.each { insnNode ->
+                switch (insnNode.opcode) {
+                    case Opcodes.NEW:
+                        transformNew(cn, methodNode, insnNode)
+                        break
+                    case Opcodes.INVOKESPECIAL:
+                        transformInvokeSpecial(cn, methodNode, insnNode)
+                        break
+                    case Opcodes.INVOKESTATIC:
+                        break
+                    case Opcodes.INVOKEVIRTUAL:
+                        transformInvokeVirtual(cn, methodNode, (MethodInsnNode) insnNode)
+                        break
+                    case Opcodes.ARETURN:
+                        transformAReturn(cn, methodNode, (InsnNode) insnNode)
+                        break
+                    default:
+                        break
                 }
             }
         }
-
-        //处理匿名内部类
-        if (Config.anonymousThreadClassList.contains(cn.name)) {
-            Config.logger("处理匿名内部线程类 ${cn.name}")
-            hookAnonymousThread(cn)
-        }
-
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS)
         cn.accept(cw)
         return cw.toByteArray()
     }
 
-    static void recordPosition(cn, methodNode,
-                               isAnonymousClass, anonymousThreadClassName, newThreadName) {
+    //setThreadName
+    static void transformAReturn(cn, methodNode, insnNode) {
+        if (methodNode.desc == '()Ljava/lang/Thread;') {
+            methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+            methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, SHADOW_THREAD,
+                    'setThreadName', '(Ljava/lang/Thread;Ljava/lang/String;)Ljava/lang/Thread;', false))
+        }
+    }
+
+
+    static void transformInvokeVirtual(cn, methodNode, insnNode) {
+        Class<?> clazz = Class.forName(THREAD_CLASS)
+        if (clazz.isAssignableFrom(Class.forName(cn.name))) {
+            if (insnNode.name == 'setName' && insnNode.desc == '(Ljava/lang/String;)V') {
+                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+                methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC,
+                        SHADOW_THREAD, 'makeThreadName', '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;'), false)
+            }
+        }
+    }
+
+    static void transformInvokeSpecial(cn, methodNode, insnNode) {
+        if (!(insnNode instanceof MethodInsnNode)) {
+            return
+        }
+        if (insnNode.name != '<init>') {
+            return
+        }
+        switch (insnNode.owner) {
+            case THREAD_CLASS:
+                transformThreadInvokeSpecial(cn, methodNode, (MethodInsnNode) insnNode)
+                break
+        }
+    }
+
+    /**
+     * 遍历 New Thread 构造函数，处理每一种情况
+     */
+    static void transformThreadInvokeSpecial(ClassNode cn, MethodNode methodNode, MethodInsnNode insnNode) {
+        switch (insnNode.desc) {
+            case '()V':     // Thread()
+            case '(Ljava/lang/Runnable;)V':     // Thread(Runnable)
+            case '(Ljava/lang/ThreadGroup;Ljava/lang/Runnable;)V':  //Thread(Group,Runnable)
+                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+                def index = insnNode.desc.indexOf(')')
+                def desc = insnNode.desc.substring(0, index) + 'Ljava/lang/String;' + insnNode.desc.substring(index)
+                insnNode.desc = desc
+                break
+
+            case '(Ljava/lang/String;)V':   //Thread(String)
+            case '(Ljava/lang/ThreadGroup;Ljava/lang/String;)V':    //Thread(ThreadGroup,String)
+            case '(Ljava/lang/Runnable;Ljava/lang/String;)V':       //Thread(Runnable,String)
+            case '(Ljava/lang/ThreadGroup;Ljava/lang/Runnable;Ljava/lang/String;)V':    //Thread(ThreadGroup,Runnable,String)
+                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+                methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC,
+                        SHADOW_THREAD, 'makeThreadName', '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;'), false)
+                break
+            case '(Ljava/lang/ThreadGroup;Ljava/lang/Runnable;Ljava/lang/String;J)V':   //Thread(ThreadGroup, Runnable, String, long)
+                // in order to modify the thread name, the penultimate argument `name` have to be moved on the top
+                // of operand stack, so that the `ShadowThread.makeThreadName(String, String)` could be invoked to
+                // consume the `name` on the top of operand stack, and then a new name returned on the top of
+                // operand stack.
+                // due to JVM does not support swap long/double on the top of operand stack, so, we have to combine
+                // DUP* and POP* to swap `name` and `stackSize`
+
+                //  ..., name,stackSize => ...,stackSize, name,stackSize
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.DUP2_X1))
+
+                //  ...,stackSize, name,stackSize => ...,stackSize, name
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.POP2))
+
+                //  ...,stackSize, name => ...,stackSize, name,prefix
+                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+
+                //  ...,stackSize, name,prefix => ...,stackSize, name
+                methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC,
+                        SHADOW_THREAD, 'makeThreadName', '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;', false))
+
+                //  ...,stackSize, name => ...,stackSize, name,name
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.DUP))
+
+                //  ...,stackSize, name,name => ...,name,name,stackSize, name,name
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.DUP2_X2))
+
+                //  ...,name,name,stackSize, name,name => ...,name,name,stackSize
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.POP2))
+
+                //  ...,name,name,stackSize => ...,name,stackSize,name,stackSize
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.DUP2_X1))
+
+                //  ...,name,stackSize,name,stackSize => ...,name,stackSize,name
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.POP2))
+
+                //  ...,name,stackSize,name => ...,name,stackSize
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.POP))
+                break
+        }
+        recordPosition(cn, methodNode, makeThreadName(cn.name))
+    }
+
+    static void transformNew(cn, methodNode, insnNode) {
+        if (insnNode instanceof TypeInsnNode) {
+            switch (insnNode.desc) {
+                case THREAD_CLASS:
+                    transformNewInner(cn, methodNode, insnNode, THREAD_CLASS)
+                    break
+            }
+        }
+    }
+
+    static void transformNewInner(ClassNode cn, MethodNode methodNode, TypeInsnNode insnNode, String type) {
+        def insnList = methodNode.instructions
+        int index = insnList.indexOf(insnNode)
+        def typeNodeDesc = insnNode.desc
+        //向后遍历，寻找 <init> 方法
+        for (int i = index + 1; i < insnList.size(); i++) {
+            AbstractInsnNode node = insnList.get(i)
+            if (node instanceof MethodInsnNode && node.opcode == Opcodes.INVOKESPECIAL && node.owner == typeNodeDesc && node.name == "<init>") {
+                insnNode.desc = type
+                node.owner = type
+                //向 descriptor 中添加 String.class 入参
+                node.desc = insertArgument(node.desc, String.class)
+                def NewName = makeThreadName(cn.name)
+                insnList.insertBefore(node, new LdcInsnNode(NewName))
+                Config.logger("替换构造对象字节码，owner 改为：${node.owner}，desc 改为 ${node.desc}")
+                recordPosition(cn, methodNode, NewName)
+                //找到一个就 break
+                break
+            }
+        }
+    }
+
+    static String makeThreadName(String className) {
+        return MARK + CommonUtil.path2ClassName(className)
+    }
+
+    static void recordPosition(cn, methodNode, newName) {
         RecordThreadPosition position = new RecordThreadPosition()
         def outerClass = cn.name
         position.outerClassName = outerClass
         position.sourceFile = cn.sourceFile
         position.invokeMethodName = methodNode.name
-        position.isAnonymousClass = isAnonymousClass
-        position.anonymousClassName = anonymousThreadClassName
-        position.replaceThreadName = newThreadName
+        position.replaceThreadName = newName
         RecordThreadPosition.positionList.add(position)
-    }
-
-    /**
-     * 对匿名线程类做处理，将匿名线程类的父类替换为工具类，同时在调用 super 的地方添加 className + methodName 前缀
-     */
-    static void hookAnonymousThread(ClassNode cn) {
-        if (cn.superName == Config.threadClass) {
-            cn.superName = Config.handleThreadClass
-            cn.methods.each { methodNode ->
-                if (methodNode.name == "<init>") {
-                    //处理构造方法，在 super 方法里添加 className 后缀
-                    def insnList = methodNode.instructions
-                    methodNode.instructions.each { insnNode ->
-                        if (insnNode instanceof MethodInsnNode && insnNode.opcode == Opcodes.INVOKESPECIAL
-                                && insnNode.name == "<init>" && insnNode.owner == Config.threadClass) {
-                            //super 方法
-                            Config.logger("找到 super 方法，desc:${insnNode.desc}")
-                            //替换 super class 为工具类
-                            insnNode.owner = Config.handleThreadClass
-                            //构造新的方法描述符，尾部增加 String 类型的参数
-                            insnNode.desc = insertArgument(insnNode.desc, String.class)
-                            def newThreadName = findAnonymousThreadClassInvokeMethod(cn)
-                            insnList.insertBefore(insnNode, new LdcInsnNode(newThreadName))
-                            Config.logger("替换 super 方法字节码，owner 改为：${insnNode.owner}，desc 改为 ${insnNode.desc}")
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    static String findAnonymousThreadClassInvokeMethod(ClassNode cn) {
-        RecordThreadPosition.positionList.each { position ->
-            if (position.isAnonymousClass && position.sourceFile == cn.sourceFile && position.outerClassName == cn.name) {
-                return position.replaceThreadName
-            }
-        }
-        return ""
     }
 
     /**
@@ -159,7 +268,6 @@ class HandleThreadTransform extends BaseTransform {
 
     @Override
     protected void onTransformStart(TransformInvocation transformInvocation) {
-        Config.logger("anonymousThreadClassList::${Config.anonymousThreadClassList}")
     }
 
     @Override

@@ -64,6 +64,17 @@ public class HandleThreadActivity extends AppCompatActivity {
         new MyThread_2("mythread_222").start();
     }
 
+    public Thread createThread(){
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+        thread.setName("11");
+        return thread;
+    }
+
     static class MyThread extends Thread {
 
         public MyThread(@NonNull String name) {

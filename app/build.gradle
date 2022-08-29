@@ -21,12 +21,11 @@ plugins {
 //    annotationName = 'checkClick'
 //}
 
-apply plugin: 'optimize_thread'
-handle_thread_config {
-    printLog = true
-    turnOn = true
-    handleThreadClass = 'com.zhangyue.ireader.toolslibrary.handleThread.OptimizeThread'
-}
+//apply plugin: 'optimize_thread'
+//handle_thread_config {
+//    printLog = true
+//    turnOn = true
+//}
 
 
 android {

@@ -12,9 +12,4 @@ class PluginParams {
      */
     boolean turnOn
 
-    /**
-     * 线程优化工具类
-     */
-    String handleThreadClass
-
 }
