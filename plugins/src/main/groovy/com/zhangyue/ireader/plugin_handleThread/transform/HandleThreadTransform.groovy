@@ -27,6 +27,8 @@ class HandleThreadTransform extends BaseTransform {
      */
     final static String THREAD_CLASS = "java/lang/Thread"
 
+    final static String THREAD_POOL_EXECUTOR = 'java/util/concurrent/Executors'
+
     /**
      * 线程处理工具集合
      */
@@ -61,6 +63,7 @@ class HandleThreadTransform extends BaseTransform {
                         transformInvokeSpecial(cn, methodNode, insnNode)
                         break
                     case Opcodes.INVOKESTATIC:
+                        transformInvokeStatic(cn, methodNode, (MethodInsnNode) insnNode)
                         break
                     case Opcodes.INVOKEVIRTUAL:
                         transformInvokeVirtual(cn, methodNode, (MethodInsnNode) insnNode)
@@ -76,6 +79,25 @@ class HandleThreadTransform extends BaseTransform {
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS)
         cn.accept(cw)
         return cw.toByteArray()
+    }
+
+
+    static void transformInvokeStatic(cn, methodNode, insnNode) {
+        if (insnNode.owner == THREAD_POOL_EXECUTOR) {
+            switch (insnNode.name) {
+                case 'newCachedThreadPool':
+                case 'newFixedThreadPool':
+                case 'newScheduledThreadPool':
+                case 'newSingleThreadExecutor':
+                case 'newSingleThreadScheduledExecutor':
+                case 'newWorkStealingPool':
+                    break
+                case 'defaultThreadFactory':
+                    break
+                default:
+                    break
+            }
+        }
     }
 
     //setThreadName
