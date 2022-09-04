@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -91,6 +92,25 @@ public class Util {
             }
         }
         return new FileOutputStream(file, append);
+    }
+
+    public static Field getField(Object classParam, String fieldName) {
+        Field field = null;
+        Class<?> clazz = classParam.getClass();
+        while (field == null && clazz != null) {
+            try {
+                field = clazz.getDeclaredField(fieldName);
+                field.setAccessible(true);
+            } catch (Exception e) {
+                //
+            }
+            if (field == null) {
+                clazz = clazz.getSuperclass();
+            }
+
+        }
+        return field;
+
     }
 
 }

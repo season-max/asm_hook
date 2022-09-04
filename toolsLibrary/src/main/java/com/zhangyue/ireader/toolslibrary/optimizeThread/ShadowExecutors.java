@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +23,11 @@ import java.util.concurrent.TimeoutException;
  * 对于{@link Executors#newWorkStealingPool},使用的很少，不做处理
  */
 public class ShadowExecutors {
+
+    /**
+     * 30 s
+     */
+    public static final int DEFAULT_KEEP_ALIVE_TIME = 30000;
 
     // <editor-fold desc="- named cache Thread pool ">
     public static ExecutorService newNamedCachedThreadPool(String name) {
@@ -85,11 +91,21 @@ public class ShadowExecutors {
 
     //没有核心线程，不需要 allowCoreThreadTimeOut 处理
     public static ExecutorService newOptimizedCachedThreadPool(String name) {
-        return Executors.newCachedThreadPool(new NamedThreadFactory(name));
+        ThreadPoolExecutor t = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+                60L, TimeUnit.SECONDS,
+                new SynchronousQueue<Runnable>(),
+                new NamedThreadFactory(name));
+        t.allowCoreThreadTimeOut(true);
+        return t;
     }
 
     public static ExecutorService newOptimizedCachedThreadPool(ThreadFactory threadFactory, String name) {
-        return Executors.newCachedThreadPool(new NamedThreadFactory(threadFactory, name));
+        ThreadPoolExecutor t = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+                60L, TimeUnit.SECONDS,
+                new SynchronousQueue<Runnable>(),
+                new NamedThreadFactory(threadFactory, name));
+        t.allowCoreThreadTimeOut(true);
+        return t;
     }
 
     // </editor-fold>
@@ -100,6 +116,7 @@ public class ShadowExecutors {
         ThreadPoolExecutor t = new ThreadPoolExecutor(nThreads, nThreads,
                 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>(), new NamedThreadFactory(name));
+        t.setKeepAliveTime(DEFAULT_KEEP_ALIVE_TIME, TimeUnit.MILLISECONDS);
         t.allowCoreThreadTimeOut(true);
         return t;
     }
@@ -109,6 +126,7 @@ public class ShadowExecutors {
                 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>(),
                 new NamedThreadFactory(threadFactory, name));
+        t.setKeepAliveTime(DEFAULT_KEEP_ALIVE_TIME, TimeUnit.MILLISECONDS);
         t.allowCoreThreadTimeOut(true);
         return t;
     }
@@ -120,6 +138,7 @@ public class ShadowExecutors {
         ThreadPoolExecutor t = new ThreadPoolExecutor(1, 1,
                 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>(), new NamedThreadFactory(name));
+        t.setKeepAliveTime(DEFAULT_KEEP_ALIVE_TIME, TimeUnit.MILLISECONDS);
         t.allowCoreThreadTimeOut(true);
         return new FinalizableDelegatedExecutorService(t);
     }
@@ -129,6 +148,7 @@ public class ShadowExecutors {
         ThreadPoolExecutor t = new ThreadPoolExecutor(1, 1,
                 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>(), new NamedThreadFactory(threadFactory, name));
+        t.setKeepAliveTime(DEFAULT_KEEP_ALIVE_TIME, TimeUnit.MILLISECONDS);
         t.allowCoreThreadTimeOut(true);
         return new FinalizableDelegatedExecutorService(t);
     }
@@ -136,7 +156,7 @@ public class ShadowExecutors {
     // </editor-fold>
 
     public static ThreadFactory defaultThreadFactory(String name) {
-        return new NamedThreadFactory(Executors.defaultThreadFactory(), name);
+        return new NamedThreadFactory(name);
     }
 
     private static class FinalizableDelegatedExecutorService

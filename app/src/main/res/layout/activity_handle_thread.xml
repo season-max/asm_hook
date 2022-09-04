@@ -1,9 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".handleThread.HandleThreadActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:id="@+id/cache"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:text="cache thread pool"
+        android:textSize="12sp" />
+
+    <Button
+        android:id="@+id/fixed"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:text="fixed thread pool"
+        android:textSize="12sp" />
+
+    <Button
+        android:id="@+id/single"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:text="single thread pool"
+        android:textSize="12sp" />
+
+    <Button
+        android:id="@+id/Scheduled"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:text="Scheduled thread pool"
+        android:textSize="12sp" />
+
+    <Button
+        android:id="@+id/single_scheduled"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:text="single scheduled thread pool"
+        android:textSize="12sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black" />
+
+    <Button
+        android:id="@+id/thread_pool_executor_1"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:text="thread_pool_executor_1"
+        android:textSize="12sp" />
+
+    <Button
+        android:id="@+id/thread_pool_executor_2"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:text="thread_pool_executor_2"
+        android:textSize="12sp" />
+
+    <Button
+        android:id="@+id/thread_pool_executor_3"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:text="thread_pool_executor_3"
+        android:textSize="12sp" />
+
+    <Button
+        android:id="@+id/thread_pool_executor_4"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:text="thread_pool_executor_4"
+        android:textSize="12sp" />
+
+</LinearLayout>

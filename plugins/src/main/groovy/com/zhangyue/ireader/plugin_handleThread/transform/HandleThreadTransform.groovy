@@ -135,7 +135,7 @@ class HandleThreadTransform extends BaseTransform {
         insnNode.owner = SHADOW_EXECUTORS
         def index = insnNode.desc.lastIndexOf(')')
         insnNode.desc = insnNode.desc.substring(0, index) + STRING_CLASS_DES + insnNode.desc.substring(index)
-        insnNode.name = enableThreadPoolOptimized ? insnNode.name.replace('new', 'Optimized') : insnNode.name.replace('new': 'newNamed')
+        insnNode.name = enableThreadPoolOptimized ? insnNode.name.replace('new', 'newOptimized') : insnNode.name.replace('new': 'newNamed')
     }
 
     /**
@@ -323,14 +323,16 @@ class HandleThreadTransform extends BaseTransform {
                 node.desc = insertArgument(node.desc, String.class)
                 //是否优化线程池
                 if (optimized) {
-                    node.desc = insertArgument(node.desc, Boolean.class)
+                    //不要写成 Boolean.class
+                    node.desc = insertArgument(node.desc, boolean.class)
+                    Config.logger("optimized desc=" + node.desc)
                 }
                 def NewName = makeThreadName(cn.name)
                 insnList.insertBefore(node, new LdcInsnNode(NewName))
                 //是否优化线程池
                 if (optimized) {
                     //true
-                    insnList.insertBefore(node, new LdcInsnNode(1))
+                    insnList.insertBefore(node, new LdcInsnNode(Boolean.TRUE))
                 }
                 Config.logger("替换构造对象字节码，owner 改为：${node.owner}，desc 改为 ${node.desc}")
                 recordPosition(cn, methodNode)

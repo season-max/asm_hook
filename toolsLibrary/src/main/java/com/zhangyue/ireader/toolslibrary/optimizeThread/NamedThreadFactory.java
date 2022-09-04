@@ -1,5 +1,7 @@
 package com.zhangyue.ireader.toolslibrary.optimizeThread;
 
+import static com.zhangyue.ireader.toolslibrary.optimizeThread.ShadowThread.MARK;
+
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -13,17 +15,17 @@ public class NamedThreadFactory implements ThreadFactory {
         return new NamedThreadFactory(factory, name);
     }
 
-    private final String name;
+    private final String prefix;
     private final ThreadGroup group;
     private final ThreadFactory threadFactory;
-    private final AtomicInteger threadNumber = new AtomicInteger(1);
+    private static final AtomicInteger threadNumber = new AtomicInteger(1);
 
     public NamedThreadFactory(String name) {
         this(null, name);
     }
 
     public NamedThreadFactory(ThreadFactory threadFactory, String name) {
-        this.name = name;
+        this.prefix = name;
         this.threadFactory = threadFactory;
         this.group = Thread.currentThread().getThreadGroup();
     }
@@ -31,7 +33,7 @@ public class NamedThreadFactory implements ThreadFactory {
     @Override
     public Thread newThread(Runnable r) {
         if (this.threadFactory == null) {
-            Thread t = new Thread(group, r, name + "_" + threadNumber.getAndIncrement(), 0);
+            Thread t = new Thread(group, r, prefix + "#thread_" + threadNumber.getAndIncrement(), 0);
             if (t.isDaemon())
                 t.setDaemon(false);
             if (t.getPriority() != Thread.NORM_PRIORITY)
@@ -39,7 +41,9 @@ public class NamedThreadFactory implements ThreadFactory {
             return t;
         }
         Thread t = this.threadFactory.newThread(r);
-        t.setName(ShadowThread.makeThreadName(t.getName(), name));
+        String name = t.getName();
+        name = name.startsWith(MARK) ? name : prefix + "#" + name;
+        t.setName(name);
         return t;
     }
 }
