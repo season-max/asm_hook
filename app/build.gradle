@@ -21,11 +21,12 @@ plugins {
 //    annotationName = 'checkClick'
 //}
 
-//apply plugin: 'optimize_thread'
-//handle_thread_config {
-//    printLog = true
-//    turnOn = true
-//}
+apply plugin: 'optimize_thread'
+handle_thread_config {
+    printLog = true
+    turnOn = true
+    enableThreadPoolOptimized = true
+}
 
 
 android {

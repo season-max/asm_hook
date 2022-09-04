@@ -16,8 +16,6 @@ public class RecordThreadPosition {
 
     public String sourceFile;
 
-    public String replaceThreadName;
-
     public static List<RecordThreadPosition> getPositionList() {
         return sPositionList;
     }
@@ -28,8 +26,6 @@ public class RecordThreadPosition {
                 "\r\n" +
                 "outerClassName----> " + outerClassName +
                 "\r\n" +
-                "invokeMethodName----> " + invokeMethodName +
-                "\r\n" +
-                "replaceThreadName----> " + replaceThreadName;
+                "invokeMethodName----> " + invokeMethodName;
     }
 }

@@ -12,4 +12,9 @@ class PluginParams {
      */
     boolean turnOn
 
+    /**
+     * 是否启用线程池优化
+     */
+    boolean enableThreadPoolOptimized
+
 }

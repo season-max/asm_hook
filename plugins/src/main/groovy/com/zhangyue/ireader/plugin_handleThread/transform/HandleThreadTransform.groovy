@@ -22,22 +22,37 @@ class HandleThreadTransform extends BaseTransform {
      */
     public static final String MARK = "\u200B"
 
+    final static String STRING_CLASS_DES = 'Ljava/lang/String;'
+
     /**
      * Thread class 的规范名称
      */
     final static String THREAD_CLASS = "java/lang/Thread"
 
-    final static String THREAD_POOL_EXECUTOR = 'java/util/concurrent/Executors'
+    /**
+     * threadPoolExecutor
+     */
+    final static String THREAD_POOL_EXECUTOR = 'java/util/concurrent/ThreadPoolExecutor'
+
+    /**
+     * Executors
+     */
+    final static String THREAD_POOL_UTIL_EXECUTORS = 'java/util/concurrent/Executors'
 
     /**
      * 线程处理工具集合
      */
+    static String TOOL_LIBRARY_PACKAGE = 'com/zhangyue/ireader/toolslibrary/'
     // 包名
-    static String OPTIMIZE_THREAD_PACKAGE = "com/zhangyue/ireader/toolslibrary/optimizeThread/"
+    static String OPTIMIZE_THREAD_PACKAGE = TOOL_LIBRARY_PACKAGE + 'optimizeThread/'
     // 线程处理类
     static String SHADOW_THREAD = OPTIMIZE_THREAD_PACKAGE + "ShadowThread"
     // Executors 处理类
     static String SHADOW_EXECUTORS = OPTIMIZE_THREAD_PACKAGE + "ShadowExecutors"
+
+    static String SHADOW_THREAD_POOL_EXECUTOR = OPTIMIZE_THREAD_PACKAGE + 'ShadowThreadPoolExecutor';
+    //线程工厂工具类
+    static String NAMED_THREAD_FACTORY = OPTIMIZE_THREAD_PACKAGE + 'NamedThreadFactory'
 
     HandleThreadTransform(Project project) {
         super(project)
@@ -50,6 +65,10 @@ class HandleThreadTransform extends BaseTransform {
 
     @Override
     protected byte[] hookClassInner(String className, byte[] bytes) {
+        if (CommonUtil.getClassInternalName(className).startsWith(TOOL_LIBRARY_PACKAGE)) {
+            Config.logger("过滤工具类-->" + className)
+            return bytes
+        }
         ClassReader cr = new ClassReader(bytes)
         ClassNode cn = new ClassNode(Opcodes.ASM9)
         cr.accept(cn, ClassReader.EXPAND_FRAMES)
@@ -65,9 +84,9 @@ class HandleThreadTransform extends BaseTransform {
                     case Opcodes.INVOKESTATIC:
                         transformInvokeStatic(cn, methodNode, (MethodInsnNode) insnNode)
                         break
-                    case Opcodes.INVOKEVIRTUAL:
-                        transformInvokeVirtual(cn, methodNode, (MethodInsnNode) insnNode)
-                        break
+//                    case Opcodes.INVOKEVIRTUAL:
+//                        transformInvokeVirtual(cn, methodNode, (MethodInsnNode) insnNode)
+//                        break
                     case Opcodes.ARETURN:
                         transformAReturn(cn, methodNode, (InsnNode) insnNode)
                         break
@@ -82,17 +101,28 @@ class HandleThreadTransform extends BaseTransform {
     }
 
 
-    static void transformInvokeStatic(cn, methodNode, insnNode) {
-        if (insnNode.owner == THREAD_POOL_EXECUTOR) {
+    static def transformInvokeStatic(cn, methodNode, insnNode) {
+        if (insnNode.owner == THREAD_POOL_UTIL_EXECUTORS) {
             switch (insnNode.name) {
                 case 'newCachedThreadPool':
                 case 'newFixedThreadPool':
-                case 'newScheduledThreadPool':
                 case 'newSingleThreadExecutor':
+                    transformThreadPool(cn, methodNode, insnNode, Config.enableThreadPoolOptimized)
+
+                    recordPosition(cn, methodNode)
+                    break
+                case 'newScheduledThreadPool':
                 case 'newSingleThreadScheduledExecutor':
-                case 'newWorkStealingPool':
+                    //对于执行定时任务的线程池，不做允许核心线程超时的优化。如果做了优化，可能带来线程周期性的销毁和重建的负面效果
+                    transformThreadPool(cn, methodNode, insnNode, false)
+
+                    recordPosition(cn, methodNode)
                     break
                 case 'defaultThreadFactory':
+                    methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+                    insnNode.owner = SHADOW_EXECUTORS
+                    def index = insnNode.desc.lastIndexOf(')')
+                    insnNode.desc = insnNode.desc.substring(0, index) + 'Ljava/lang/String;' + insnNode.desc.substring(index)
                     break
                 default:
                     break
@@ -100,8 +130,19 @@ class HandleThreadTransform extends BaseTransform {
         }
     }
 
-    //setThreadName
-    static void transformAReturn(cn, methodNode, insnNode) {
+    static def transformThreadPool(ClassNode cn, MethodNode methodNode, MethodInsnNode insnNode, boolean enableThreadPoolOptimized) {
+        methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+        insnNode.owner = SHADOW_EXECUTORS
+        def index = insnNode.desc.lastIndexOf(')')
+        insnNode.desc = insnNode.desc.substring(0, index) + STRING_CLASS_DES + insnNode.desc.substring(index)
+        insnNode.name = enableThreadPoolOptimized ? insnNode.name.replace('new', 'Optimized') : insnNode.name.replace('new': 'newNamed')
+    }
+
+    /**
+     * return 一个 Thread 前，修改名称
+     */
+    static def transformAReturn(cn, methodNode, insnNode) {
+        //return时 操作数栈栈顶是 Thread 引用
         if (methodNode.desc == '()Ljava/lang/Thread;') {
             methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
             methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, SHADOW_THREAD,
@@ -110,18 +151,18 @@ class HandleThreadTransform extends BaseTransform {
     }
 
 
-    static void transformInvokeVirtual(cn, methodNode, insnNode) {
-        Class<?> clazz = Class.forName(THREAD_CLASS)
-        if (clazz.isAssignableFrom(Class.forName(cn.name))) {
-            if (insnNode.name == 'setName' && insnNode.desc == '(Ljava/lang/String;)V') {
-                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
-                methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC,
-                        SHADOW_THREAD, 'makeThreadName', '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;'), false)
-            }
-        }
+    static def transformInvokeVirtual(cn, methodNode, insnNode) {
+//        Class<?> clazz = Class.forName(THREAD_CLASS)
+//        if (clazz.isAssignableFrom(Class.forName(cn.name))) {
+//            if (insnNode.name == 'setName' && insnNode.desc == '(Ljava/lang/String;)V') {
+//                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+//                methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC,
+//                        SHADOW_THREAD, 'makeThreadName', '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;'), false)
+//            }
+//        }
     }
 
-    static void transformInvokeSpecial(cn, methodNode, insnNode) {
+    static def transformInvokeSpecial(cn, methodNode, insnNode) {
         if (!(insnNode instanceof MethodInsnNode)) {
             return
         }
@@ -130,21 +171,72 @@ class HandleThreadTransform extends BaseTransform {
         }
         switch (insnNode.owner) {
             case THREAD_CLASS:
-                transformThreadInvokeSpecial(cn, methodNode, (MethodInsnNode) insnNode)
+                transformThreadInvokeSpecial(cn, methodNode, insnNode)
+                recordPosition(cn, methodNode)
+                break
+            case THREAD_POOL_EXECUTOR:
+                transformThreadPoolExecutorInvokeSpecial(cn, methodNode, (MethodInsnNode) insnNode)
+                recordPosition(cn, methodNode)
+                break
+            default:
                 break
         }
     }
 
     /**
-     * 遍历 New Thread 构造函数，处理每一种情况
+     * 处理 threadPoolExecutor
+     * 参数都已经压入操作数栈
      */
-    static void transformThreadInvokeSpecial(ClassNode cn, MethodNode methodNode, MethodInsnNode insnNode) {
+    static def transformThreadPoolExecutorInvokeSpecial(ClassNode cn, MethodNode methodNode, MethodInsnNode insnNode) {
+        switch (insnNode.desc) {
+        //--> int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue
+            case '(IIJLjava/util/concurrent/TimeUnit;Ljava/util/concurrent/BlockingQueue;)V':
+                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+                methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, NAMED_THREAD_FACTORY, 'newInstance',
+                        '(Ljava/lang/String;)Ljava/util/concurrent/ThreadFactory;', false))
+                insnNode.desc = '(IIJLjava/util/concurrent/TimeUnit;Ljava/util/concurrent/BlockingQueue;Ljava/util/concurrent/ThreadFactory;)V'
+                break
+                //--> int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory
+            case '(IIJLjava/util/concurrent/TimeUnit;Ljava/util/concurrent/BlockingQueue;Ljava/util/concurrent/ThreadFactory;)V':
+                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+                methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, NAMED_THREAD_FACTORY, 'newInstance',
+                        '(Ljava/util/concurrent/ThreadFactory;Ljava/lang/String;)Ljava/util/concurrent/ThreadFactory;', false))
+                break
+                //--> liveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, RejectedExecutionHandler handler
+            case '(IIJLjava/util/concurrent/TimeUnit;Ljava/util/concurrent/BlockingQueue;Ljava/util/concurrent/RejectedExecutionHandler;)V':
+                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+                methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, NAMED_THREAD_FACTORY, 'newInstance',
+                        '(Ljava/lang/String;)Ljava/util/concurrent/ThreadFactory;', false))
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
+                break
+                //--> int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, RejectedExecutionHandler handler
+            case '(IIJLjava/util/concurrent/TimeUnit;Ljava/util/concurrent/BlockingQueue;Ljava/util/concurrent/ThreadFactory;Ljava/util/concurrent/RejectedExecutionHandler;)V':
+                // ..., threadFactory,handler -> ..., handler,threadFactory
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
+                // ..., handler,threadFactory -> ...,handler,threadFactory,name
+                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+                // ...,handler,threadFactory,name -> ..., handler,threadFactory
+                methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, NAMED_THREAD_FACTORY, 'newInstance',
+                        '(Ljava/util/concurrent/ThreadFactory;Ljava/lang/String;)Ljava/util/concurrent/ThreadFactory;', false))
+                //交换回来，符合参数顺序
+                // ..., handler,threadFactory -> ..., threadFactory,handler
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
+                break
+            default:
+                break
+        }
+    }
+
+    /**
+     * 处理 Thread
+     */
+    static def transformThreadInvokeSpecial(ClassNode cn, MethodNode methodNode, MethodInsnNode insnNode) {
         switch (insnNode.desc) {
             case '()V':     // Thread()
             case '(Ljava/lang/Runnable;)V':     // Thread(Runnable)
             case '(Ljava/lang/ThreadGroup;Ljava/lang/Runnable;)V':  //Thread(Group,Runnable)
                 methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
-                def index = insnNode.desc.indexOf(')')
+                def index = insnNode.desc.lastIndexOf(')')
                 def desc = insnNode.desc.substring(0, index) + 'Ljava/lang/String;' + insnNode.desc.substring(index)
                 insnNode.desc = desc
                 break
@@ -155,7 +247,7 @@ class HandleThreadTransform extends BaseTransform {
             case '(Ljava/lang/ThreadGroup;Ljava/lang/Runnable;Ljava/lang/String;)V':    //Thread(ThreadGroup,Runnable,String)
                 methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
                 methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC,
-                        SHADOW_THREAD, 'makeThreadName', '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;'), false)
+                        SHADOW_THREAD, 'makeThreadName', '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;', false))
                 break
             case '(Ljava/lang/ThreadGroup;Ljava/lang/Runnable;Ljava/lang/String;J)V':   //Thread(ThreadGroup, Runnable, String, long)
                 // in order to modify the thread name, the penultimate argument `name` have to be moved on the top
@@ -197,20 +289,27 @@ class HandleThreadTransform extends BaseTransform {
                 methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.POP))
                 break
         }
-        recordPosition(cn, methodNode, makeThreadName(cn.name))
     }
 
-    static void transformNew(cn, methodNode, insnNode) {
+    /**
+     * 处理 New 指令
+     */
+    static def transformNew(cn, methodNode, insnNode) {
         if (insnNode instanceof TypeInsnNode) {
             switch (insnNode.desc) {
                 case THREAD_CLASS:
-                    transformNewInner(cn, methodNode, insnNode, THREAD_CLASS)
+                    transformNewInner(cn, methodNode, insnNode, SHADOW_THREAD, false)
+                    break
+                case THREAD_POOL_EXECUTOR:
+                    transformNewInner(cn, methodNode, insnNode, SHADOW_THREAD_POOL_EXECUTOR, Config.enableThreadPoolOptimized)
+                    break
+                default:
                     break
             }
         }
     }
 
-    static void transformNewInner(ClassNode cn, MethodNode methodNode, TypeInsnNode insnNode, String type) {
+    static def transformNewInner(cn, methodNode, insnNode, type, optimized) {
         def insnList = methodNode.instructions
         int index = insnList.indexOf(insnNode)
         def typeNodeDesc = insnNode.desc
@@ -222,10 +321,19 @@ class HandleThreadTransform extends BaseTransform {
                 node.owner = type
                 //向 descriptor 中添加 String.class 入参
                 node.desc = insertArgument(node.desc, String.class)
+                //是否优化线程池
+                if (optimized) {
+                    node.desc = insertArgument(node.desc, Boolean.class)
+                }
                 def NewName = makeThreadName(cn.name)
                 insnList.insertBefore(node, new LdcInsnNode(NewName))
+                //是否优化线程池
+                if (optimized) {
+                    //true
+                    insnList.insertBefore(node, new LdcInsnNode(1))
+                }
                 Config.logger("替换构造对象字节码，owner 改为：${node.owner}，desc 改为 ${node.desc}")
-                recordPosition(cn, methodNode, NewName)
+                recordPosition(cn, methodNode)
                 //找到一个就 break
                 break
             }
@@ -236,37 +344,13 @@ class HandleThreadTransform extends BaseTransform {
         return MARK + CommonUtil.path2ClassName(className)
     }
 
-    static void recordPosition(cn, methodNode, newName) {
+    static def recordPosition(cn, methodNode) {
         RecordThreadPosition position = new RecordThreadPosition()
         def outerClass = cn.name
         position.outerClassName = outerClass
         position.sourceFile = cn.sourceFile
         position.invokeMethodName = methodNode.name
-        position.replaceThreadName = newName
         RecordThreadPosition.positionList.add(position)
-    }
-
-    /**
-     * 对线程名称做处理 ，添加 className + methodName 前缀
-     * @return 替换后的线程名称
-     */
-    static void hookNewThread(methodNode, insnNode, newThreadName) {
-        def insnList = methodNode.instructions
-        int index = insnList.indexOf(insnNode)
-        def typeNodeDesc = insnNode.desc
-        for (int i = index + 1; i < insnList.size(); i++) {
-            AbstractInsnNode node = insnList.get(i)
-            if (node instanceof MethodInsnNode && node.opcode == Opcodes.INVOKESPECIAL && node.owner == typeNodeDesc && node.name == "<init>") {
-                insnNode.desc = Config.handleThreadClass
-                node.owner = Config.handleThreadClass
-                //向 method descriptor 中添加 类名 + 调用方法名 参数
-                node.desc = insertArgument(node.desc, String.class)
-                insnList.insertBefore(node, new LdcInsnNode(newThreadName))
-                Config.logger("替换构造对象字节码，owner 改为：${node.owner}，desc 改为 ${node.desc}")
-                //找到一个就 break
-                break
-            }
-        }
     }
 
     /**

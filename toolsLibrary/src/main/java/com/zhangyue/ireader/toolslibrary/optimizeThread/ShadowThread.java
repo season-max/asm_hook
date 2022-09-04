@@ -1,7 +1,5 @@
 package com.zhangyue.ireader.toolslibrary.optimizeThread;
 
-import android.text.TextUtils;
-
 import androidx.annotation.Nullable;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,7 +18,7 @@ public class ShadowThread extends Thread {
     private static final AtomicInteger threadNumber = new AtomicInteger(0);
 
     public static String makeThreadName(String name, String prefix) {
-        return name == null ? prefix : name.startsWith(MARK) ? name : (prefix + "#" + name);
+        return generateName(name, prefix);
     }
 
     public static Thread setThreadName(Thread thread, String prefix) {

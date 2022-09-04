@@ -12,6 +12,11 @@ class Config {
      */
     static boolean turnOn
 
+    /**
+     * 是否启用线程池优化
+     */
+    static boolean enableThreadPoolOptimized
+
 
     static void logger(String msg) {
         if (!printLog) {

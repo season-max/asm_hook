@@ -18,7 +18,8 @@ class PluginEntry implements Plugin<Project> {
         project.afterEvaluate {
             Config.printLog = project.handle_thread_config.printLog
             Config.turnOn = project.handle_thread_config.turnOn
-            Config.logger("printLog=${Config.printLog},turnOn=${Config.turnOn}")
+            Config.enableThreadPoolOptimized = project.handle_thread_config.enableThreadPoolOptimized
+            Config.logger("printLog=${Config.printLog},turnOn=${Config.turnOn},enableThreadPoolOptimized=${Config.enableThreadPoolOptimized}")
         }
 
     }
