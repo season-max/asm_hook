@@ -208,6 +208,7 @@ class HandleThreadTransform extends BaseTransform {
                 methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, NAMED_THREAD_FACTORY, 'newInstance',
                         '(Ljava/lang/String;)Ljava/util/concurrent/ThreadFactory;', false))
                 methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
+                insnNode.desc = '(IIJLjava/util/concurrent/TimeUnit;Ljava/util/concurrent/BlockingQueue;Ljava/util/concurrent/ThreadFactory;Ljava/util/concurrent/RejectedExecutionHandler;)V'
                 break
                 //--> int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, RejectedExecutionHandler handler
             case '(IIJLjava/util/concurrent/TimeUnit;Ljava/util/concurrent/BlockingQueue;Ljava/util/concurrent/ThreadFactory;Ljava/util/concurrent/RejectedExecutionHandler;)V':

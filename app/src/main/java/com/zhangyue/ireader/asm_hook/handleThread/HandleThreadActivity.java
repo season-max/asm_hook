@@ -33,6 +33,9 @@ public class HandleThreadActivity extends AppCompatActivity {
         //threadPoolExecutor
         handleThreadPoolExecutor();
 
+        //handle threadPoolExecutor subClass
+        handleThreadPoolExecutorSubClass();
+
         //线程
         Runnable runnable = new Runnable() {
             @Override
@@ -261,5 +264,66 @@ public class HandleThreadActivity extends AppCompatActivity {
         });
     }
 
+    private void handleThreadPoolExecutorSubClass() {
+        findViewById(R.id.sub_thread_pool_executor_1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ThreadPoolExecutor service = new TestThreadPoolExecutor(1, 1, 30, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+                service.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                });
+            }
+        });
+
+
+        findViewById(R.id.sub_thread_pool_executor_2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ThreadPoolExecutor service = new TestThreadPoolExecutor(1, 1, 30, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), Executors.defaultThreadFactory());
+                service.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                });
+            }
+        });
+
+
+        findViewById(R.id.sub_thread_pool_executor_3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ThreadPoolExecutor service = new TestThreadPoolExecutor(1, 1, 30, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), (r, executor) -> {
+
+                });
+                service.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                });
+            }
+        });
+
+
+        findViewById(R.id.sub_thread_pool_executor_4).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ThreadPoolExecutor service = new TestThreadPoolExecutor(1, 1, 30, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), Executors.defaultThreadFactory(), (r, executor) -> {
+
+                });
+                service.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                });
+            }
+        });
+
+    }
 
 }
