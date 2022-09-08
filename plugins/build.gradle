@@ -32,7 +32,6 @@ java {
 }
 
 
-
 //---------------------------------发布插件-------------------------------------------------------------------------------------------
 
 buildscript {
@@ -46,97 +45,9 @@ buildscript {
         classpath "com.gradle.publish:plugin-publish-plugin:1.0.0"
     }
 }
-////-----------上传到 gradle 门户----------
-//apply plugin: "com.gradle.plugin-publish"
-//group = 'io.github.season-max' //插件的群组，插件的classpath会用到
-//version = '0.95'   //配置插件的版本号
-////
-//pluginBundle {
-//    website = 'https://github.com/season-max/asm_hook'
-//    vcsUrl = 'https://github.com/season-max/asm_hook'
-//    description = 'plugins write by asm'  //插件描述
-//    tags = ['asm', 'plugin', 'compliance check', 'thread check']  //插件的tag。可以通过这个在插件门户上搜索
-//
-//    pluginTags = [
-//            privacyPlugin   : ['individual', 'compliance check'],
-//            threadCheckPlugin: ['individual', 'anonymous thread check']
-//    ]
-//}
-//
-//gradlePlugin {
-//    plugins {
-//        privacyPlugin {
-//            id = 'io.github.season-max.privacycheck'
-//            implementationClass = 'com.zhangyue.ireader.plugin_privacy.PluginEntry'
-//            displayName = 'privacy check plugin'
-//            description = 'gradle plugin for compliance check'
-//        }
-//        threadCheckPlugin{
-//            id = 'io.github.season-max.anonymousThreadCheck'
-//            implementationClass = 'com.zhangyue.ireader.plugin_handleThread.PluginEntry'
-//            displayName = 'check anonymous thread plugin'
-//            description = 'grale plugin for check anonymous thread'
-//        }
-//    }
-//}
+//-----------上传到 gradle 门户----------
+apply from: 'upload_to_gradlePortal.gradle'
 
 
 //------------------上传到 github package-----------
-apply plugin: 'maven-publish'
-
-ext {
-    plugin_groupId = 'com.season-max.gradle'
-    plugin_artifactId = 'plugins'
-    plugin_version = '1.0.5'
-    local = true //true-上传到本地  false-上传到笔者的 github package（接入方无法使用）
-}
-
-def javadocJar = task("javadocJar", type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-def sourcesJar = task("sourcesJar", type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.groovy
-}
-// 读取github.properties文件里的授权信息，不要把这个文件push到GitHub
-def githubProperties = new Properties()
-githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
-
-// 因为用于定义发布类型的components是在afterEvaluate阶段被创建的，所以必须把发布配置写在project.afterEvaluate {}代码块中
-afterEvaluate {
-    // 定义发布
-    publishing {
-        // 定义要发布到的远程Maven仓库，可以定义多个，gradle会自动生成发送到指定Maven仓库的task
-        repositories {
-            maven {
-                if (local) {
-                    url = uri('../repo')
-                } else {
-                    name = "GitHubPackages"
-                    // 指定要发布到的GitHub Repository仓库url
-                    url = uri('https://maven.pkg.github.com/season-max/asm_hook')
-                    credentials {
-                        // 用户名和token
-                        println "--->username:${githubProperties.getProperty("username")},-->token_key:${githubProperties.getProperty("token_key")}"
-                        username = githubProperties.getProperty("username")
-                        password = githubProperties.getProperty("token_key")
-                    }
-                }
-
-            }
-        }
-        // 定义要发布的包，可以定义多个，gradle会自动生成把不同的包发送到指定的Maven仓库的task
-        publications {
-            gpr(MavenPublication) {
-                from(components.java)
-                groupId = plugin_groupId
-                artifactId = plugin_artifactId
-                version = plugin_version
-
-                artifact javadocJar
-                artifact sourcesJar
-            }
-        }
-    }
-}
+//apply from: 'upload_to_githubPkg.gradle'

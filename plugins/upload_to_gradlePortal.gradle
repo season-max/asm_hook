@@ -1,0 +1,33 @@
+//上传到 gradle 门户
+apply plugin: "com.gradle.plugin-publish"
+group = 'io.github.season-max' //插件的群组，插件的classpath会用到
+version = '0.952'   //配置插件的版本号
+//
+pluginBundle {
+    website = 'https://github.com/season-max/asm_hook'
+    vcsUrl = 'https://github.com/season-max/asm_hook'
+    description = 'plugins write by asm'  //插件描述
+    tags = ['asm', 'plugin', 'compliance check', 'thread optimized']  //插件的tag。可以通过这个在插件门户上搜索
+
+    pluginTags = [
+            privacyPlugin    : ['individual', 'compliance check'],
+            threadCheckPlugin: ['individual', 'optimized thread check']
+    ]
+}
+
+gradlePlugin {
+    plugins {
+        privacyPlugin {
+            id = 'io.github.season-max.privacycheck'
+            implementationClass = 'com.zhangyue.ireader.plugin_privacy.PluginEntry'
+            displayName = 'privacy check plugin'
+            description = 'gradle plugin for compliance check'
+        }
+        threadCheckPlugin {
+            id = 'io.github.season-max.optimizedThread'
+            implementationClass = 'com.zhangyue.ireader.plugin_handleThread.PluginEntry'
+            displayName = 'optimized thread plugin'
+            description = 'grale plugin for optimized thread'
+        }
+    }
+}
