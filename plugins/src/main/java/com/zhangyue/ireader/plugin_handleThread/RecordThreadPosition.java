@@ -16,6 +16,10 @@ public class RecordThreadPosition {
 
     public String sourceFile;
 
+    public String originInsnNode;
+
+    public String afterInsnNode;
+
     public static List<RecordThreadPosition> getPositionList() {
         return sPositionList;
     }
@@ -26,6 +30,11 @@ public class RecordThreadPosition {
                 "\r\n" +
                 "outerClassName----> " + outerClassName +
                 "\r\n" +
-                "invokeMethodName----> " + invokeMethodName;
+                "invokeMethodName----> " + invokeMethodName +
+                "\r\n" +
+                "originInsnNode----> " + originInsnNode +
+                "\r\n" +
+                "afterInsnNode----> " + afterInsnNode
+                ;
     }
 }

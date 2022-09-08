@@ -87,9 +87,9 @@ class HandleThreadTransform extends BaseTransform {
 //                    case Opcodes.INVOKEVIRTUAL:
 //                        transformInvokeVirtual(cn, methodNode, (MethodInsnNode) insnNode)
 //                        break
-                    case Opcodes.ARETURN:
-                        transformAReturn(cn, methodNode, (InsnNode) insnNode)
-                        break
+//                    case Opcodes.ARETURN:
+//                        transformAReturn(cn, methodNode, (InsnNode) insnNode)
+//                        break
                     default:
                         break
                 }
@@ -103,20 +103,18 @@ class HandleThreadTransform extends BaseTransform {
 
     static def transformInvokeStatic(cn, methodNode, insnNode) {
         if (insnNode.owner == THREAD_POOL_UTIL_EXECUTORS) {
+            boolean report = true
+            def origin = 'owner:' + insnNode.owner + ',name:' + insnNode.name + ',desc:' + insnNode.desc
             switch (insnNode.name) {
                 case 'newCachedThreadPool':
                 case 'newFixedThreadPool':
                 case 'newSingleThreadExecutor':
                     transformThreadPool(cn, methodNode, insnNode, Config.enableThreadPoolOptimized)
-
-                    recordPosition(cn, methodNode)
                     break
                 case 'newScheduledThreadPool':
                 case 'newSingleThreadScheduledExecutor':
                     //对于执行定时任务的线程池，不做允许核心线程超时的优化。如果做了优化，可能带来线程周期性的销毁和重建的负面效果
                     transformThreadPool(cn, methodNode, insnNode, false)
-
-                    recordPosition(cn, methodNode)
                     break
                 case 'defaultThreadFactory':
                     methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
@@ -125,7 +123,12 @@ class HandleThreadTransform extends BaseTransform {
                     insnNode.desc = insnNode.desc.substring(0, index) + 'Ljava/lang/String;' + insnNode.desc.substring(index)
                     break
                 default:
+                    report = false
                     break
+            }
+            if (report) {
+                def after = 'owner:' + insnNode.owner + ',name:' + insnNode.name + ',desc:' + insnNode.desc
+                recordPosition(cn, methodNode, origin, after)
             }
         }
     }
@@ -172,11 +175,9 @@ class HandleThreadTransform extends BaseTransform {
         switch (insnNode.owner) {
             case THREAD_CLASS:
                 transformThreadInvokeSpecial(cn, methodNode, insnNode)
-                recordPosition(cn, methodNode)
                 break
             case THREAD_POOL_EXECUTOR:
                 transformThreadPoolExecutorInvokeSpecial(cn, methodNode, (MethodInsnNode) insnNode)
-                recordPosition(cn, methodNode)
                 break
             default:
                 break
@@ -188,6 +189,8 @@ class HandleThreadTransform extends BaseTransform {
      * 参数都已经压入操作数栈
      */
     static def transformThreadPoolExecutorInvokeSpecial(ClassNode cn, MethodNode methodNode, MethodInsnNode insnNode) {
+        boolean report = true
+        def origin = 'owner:' + insnNode.owner + ',name:' + insnNode.name + ',desc:' + insnNode.desc
         switch (insnNode.desc) {
         //--> int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue
             case '(IIJLjava/util/concurrent/TimeUnit;Ljava/util/concurrent/BlockingQueue;)V':
@@ -224,7 +227,12 @@ class HandleThreadTransform extends BaseTransform {
                 methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
                 break
             default:
+                report = false
                 break
+        }
+        if (report) {
+            def after = 'owner:' + insnNode.owner + ',name:' + insnNode.name + ',desc:' + insnNode.desc
+            recordPosition(cn, methodNode, origin, after)
         }
     }
 
@@ -232,6 +240,8 @@ class HandleThreadTransform extends BaseTransform {
      * 处理 Thread
      */
     static def transformThreadInvokeSpecial(ClassNode cn, MethodNode methodNode, MethodInsnNode insnNode) {
+        boolean report = true
+        def origin = 'owner:' + insnNode.owner + ',name:' + insnNode.name + ',desc:' + insnNode.desc
         switch (insnNode.desc) {
             case '()V':     // Thread()
             case '(Ljava/lang/Runnable;)V':     // Thread(Runnable)
@@ -289,6 +299,13 @@ class HandleThreadTransform extends BaseTransform {
                 //  ...,name,stackSize,name => ...,name,stackSize
                 methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.POP))
                 break
+            default:
+                report = false
+                break
+        }
+        if (report) {
+            def after = 'owner:' + insnNode.owner + ',name:' + insnNode.name + ',desc:' + insnNode.desc
+            recordPosition(cn, methodNode, origin, after)
         }
     }
 
@@ -310,7 +327,7 @@ class HandleThreadTransform extends BaseTransform {
         }
     }
 
-    static def transformNewInner(cn, methodNode, insnNode, type, optimized) {
+    static def transformNewInner(ClassNode cn, MethodNode methodNode, TypeInsnNode insnNode, type, optimized) {
         def insnList = methodNode.instructions
         int index = insnList.indexOf(insnNode)
         def typeNodeDesc = insnNode.desc
@@ -318,6 +335,7 @@ class HandleThreadTransform extends BaseTransform {
         for (int i = index + 1; i < insnList.size(); i++) {
             AbstractInsnNode node = insnList.get(i)
             if (node instanceof MethodInsnNode && node.opcode == Opcodes.INVOKESPECIAL && node.owner == typeNodeDesc && node.name == "<init>") {
+                def origin = 'desc:' + insnNode.desc // 记录
                 insnNode.desc = type
                 node.owner = type
                 //向 descriptor 中添加 String.class 入参
@@ -336,7 +354,11 @@ class HandleThreadTransform extends BaseTransform {
                     insnList.insertBefore(node, new LdcInsnNode(Boolean.TRUE))
                 }
                 Config.logger("替换构造对象字节码，owner 改为：${node.owner}，desc 改为 ${node.desc}")
-                recordPosition(cn, methodNode)
+
+                //记录
+                def after = 'desc:' + insnNode.desc
+                //记录位置
+                recordPosition(cn, methodNode, origin, after)
                 //找到一个就 break
                 break
             }
@@ -347,12 +369,14 @@ class HandleThreadTransform extends BaseTransform {
         return MARK + CommonUtil.path2ClassName(className)
     }
 
-    static def recordPosition(cn, methodNode) {
+    static def recordPosition(cn, methodNode, String origin, String after) {
         RecordThreadPosition position = new RecordThreadPosition()
         def outerClass = cn.name
         position.outerClassName = outerClass
         position.sourceFile = cn.sourceFile
         position.invokeMethodName = methodNode.name
+        position.originInsnNode = origin
+        position.afterInsnNode = after
         RecordThreadPosition.positionList.add(position)
     }
 
