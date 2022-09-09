@@ -8,6 +8,10 @@ class CommonUtil {
         return pathName.replace(File.separator, ".").replace(".class", "")
     }
 
+    static String normalClassName(String name) {
+        return name.replaceAll(File.separator, '.')
+    }
+
     static String getClassInternalName(String name) {
         return name.replace(".", File.separator)
     }

@@ -335,7 +335,7 @@ class HandleThreadTransform extends BaseTransform {
         for (int i = index + 1; i < insnList.size(); i++) {
             AbstractInsnNode node = insnList.get(i)
             if (node instanceof MethodInsnNode && node.opcode == Opcodes.INVOKESPECIAL && node.owner == typeNodeDesc && node.name == "<init>") {
-                def origin = 'desc:' + insnNode.desc // 记录
+                def origin = 'owner:' + node.owner + ',name:' + node.name + ',desc:' + node.desc // 记录
                 insnNode.desc = type
                 node.owner = type
                 //向 descriptor 中添加 String.class 入参
@@ -353,10 +353,9 @@ class HandleThreadTransform extends BaseTransform {
                     //true
                     insnList.insertBefore(node, new LdcInsnNode(Boolean.TRUE))
                 }
-                Config.logger("替换构造对象字节码，owner 改为：${node.owner}，desc 改为 ${node.desc}")
 
                 //记录
-                def after = 'desc:' + insnNode.desc
+                def after = 'owner:' + node.owner + ',name:' + node.name + ',desc:' + node.desc // 记录
                 //记录位置
                 recordPosition(cn, methodNode, origin, after)
                 //找到一个就 break
@@ -366,13 +365,13 @@ class HandleThreadTransform extends BaseTransform {
     }
 
     static String makeThreadName(String className) {
-        return MARK + CommonUtil.path2ClassName(className)
+        return MARK + CommonUtil.normalClassName(className)
     }
 
     static def recordPosition(cn, methodNode, String origin, String after) {
         RecordThreadPosition position = new RecordThreadPosition()
         def outerClass = cn.name
-        position.outerClassName = outerClass
+        position.outerClassName = CommonUtil.normalClassName(outerClass)
         position.sourceFile = cn.sourceFile
         position.invokeMethodName = methodNode.name
         position.originInsnNode = origin

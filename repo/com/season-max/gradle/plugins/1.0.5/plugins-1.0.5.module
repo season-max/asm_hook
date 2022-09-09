@@ -11,7 +11,7 @@
   "createdBy": {
     "gradle": {
       "version": "6.2",
-      "buildId": "wwbmup7nszbi3lywb6qxcwdo7m"
+      "buildId": "qgeobib5yraz5mush7ri52tw4m"
     }
   },
   "variants": [
@@ -28,11 +28,11 @@
         {
           "name": "plugins-1.0.5.jar",
           "url": "plugins-1.0.5.jar",
-          "size": 128619,
-          "sha512": "e9268ce3ad40b379b508f596ee36baf53454eb1dc0c5fb841147ba5c76a6e128119cb66bf4173909d3d3c1bbc453e9ba2ea486c09075d12aee556a28a13274f9",
-          "sha256": "8649c3a4b88990440dc41a09bb26ed3d708656f721e093aef25193a0d0f2153f",
-          "sha1": "d59d827afa28828734e9a8cfbbf381214a6c3cb4",
-          "md5": "4834c0eee26e35aeb24c0c03ef48ee19"
+          "size": 128750,
+          "sha512": "b352b610d93d3198e38ceb2c242e13ad48353cf5a882456e6dacca28958bb53622dd76c3e32edd328eb1944ce34dcc9d482701aae99466e46aa141a542ecf8c6",
+          "sha256": "14d94e907a8ef5da012e1d4f5cd46e1ad89adb7c2ec9c191cd6c6ad281aad8b6",
+          "sha1": "6a16d899d50a5bcb2996fc0edca0eb9080865d56",
+          "md5": "816a20908179d31febcba707280f62d6"
         }
       ]
     },
@@ -72,11 +72,11 @@
         {
           "name": "plugins-1.0.5.jar",
           "url": "plugins-1.0.5.jar",
-          "size": 128619,
-          "sha512": "e9268ce3ad40b379b508f596ee36baf53454eb1dc0c5fb841147ba5c76a6e128119cb66bf4173909d3d3c1bbc453e9ba2ea486c09075d12aee556a28a13274f9",
-          "sha256": "8649c3a4b88990440dc41a09bb26ed3d708656f721e093aef25193a0d0f2153f",
-          "sha1": "d59d827afa28828734e9a8cfbbf381214a6c3cb4",
-          "md5": "4834c0eee26e35aeb24c0c03ef48ee19"
+          "size": 128750,
+          "sha512": "b352b610d93d3198e38ceb2c242e13ad48353cf5a882456e6dacca28958bb53622dd76c3e32edd328eb1944ce34dcc9d482701aae99466e46aa141a542ecf8c6",
+          "sha256": "14d94e907a8ef5da012e1d4f5cd46e1ad89adb7c2ec9c191cd6c6ad281aad8b6",
+          "sha1": "6a16d899d50a5bcb2996fc0edca0eb9080865d56",
+          "md5": "816a20908179d31febcba707280f62d6"
         }
       ]
     }
