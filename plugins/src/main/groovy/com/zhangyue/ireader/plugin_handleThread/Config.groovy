@@ -17,6 +17,11 @@ class Config {
      */
     static boolean enableThreadPoolOptimized
 
+    /**
+     * 是否启用执行定时任务的线程池优化
+     */
+    static boolean enableScheduleThreadPoolOptimized
+
 
     static void logger(String msg) {
         if (!printLog) {

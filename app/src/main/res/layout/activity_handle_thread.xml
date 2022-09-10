@@ -131,6 +131,90 @@
             android:text="sub_thread_pool_executor_4"
             android:textSize="12sp" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/black" />
+
+        <TextView
+            android:text="New Timer"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/New_Timer_1"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:text="New_Timer_1"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/New_Timer_2"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:text="New_Timer_2"
+            android:textSize="12sp" />
+
+
+        <Button
+            android:id="@+id/New_Timer_3"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:text="New_Timer_3"
+            android:textSize="12sp" />
+
+
+        <Button
+            android:id="@+id/New_Timer_4"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:text="New_Timer_4"
+            android:textSize="12sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/black" />
+
+        <TextView
+            android:text="Timer Subclass"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/Sub_Timer_1"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:text="Sub_Timer_1"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/Sub_Timer_2"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:text="Sub_Timer_2"
+            android:textSize="12sp" />
+
+
+        <Button
+            android:id="@+id/Sub_Timer_3"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:text="Sub_Timer_3"
+            android:textSize="12sp" />
+
+
+
+        <Button
+            android:id="@+id/Sub_Timer_4"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:text="Sub_Timer_4"
+            android:textSize="12sp" />
+
+
     </LinearLayout>
 
 </ScrollView>

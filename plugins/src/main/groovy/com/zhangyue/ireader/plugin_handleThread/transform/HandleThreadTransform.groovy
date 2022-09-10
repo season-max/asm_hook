@@ -40,6 +40,11 @@ class HandleThreadTransform extends BaseTransform {
     final static String THREAD_POOL_UTIL_EXECUTORS = 'java/util/concurrent/Executors'
 
     /**
+     * Timer
+     */
+    final static String TIMER = 'java/util/Timer'
+
+    /**
      * 线程处理工具集合
      */
     static String TOOL_LIBRARY_PACKAGE = 'com/zhangyue/ireader/toolslibrary/'
@@ -49,8 +54,10 @@ class HandleThreadTransform extends BaseTransform {
     static String SHADOW_THREAD = OPTIMIZE_THREAD_PACKAGE + "ShadowThread"
     // Executors 处理类
     static String SHADOW_EXECUTORS = OPTIMIZE_THREAD_PACKAGE + "ShadowExecutors"
+    // Timer 处理类
+    static String SHADOW_TIMER = OPTIMIZE_THREAD_PACKAGE + 'ShadowTimer'
 
-    static String SHADOW_THREAD_POOL_EXECUTOR = OPTIMIZE_THREAD_PACKAGE + 'ShadowThreadPoolExecutor';
+    static String SHADOW_THREAD_POOL_EXECUTOR = OPTIMIZE_THREAD_PACKAGE + 'ShadowThreadPoolExecutor'
     //线程工厂工具类
     static String NAMED_THREAD_FACTORY = OPTIMIZE_THREAD_PACKAGE + 'NamedThreadFactory'
 
@@ -113,8 +120,7 @@ class HandleThreadTransform extends BaseTransform {
                     break
                 case 'newScheduledThreadPool':
                 case 'newSingleThreadScheduledExecutor':
-                    //对于执行定时任务的线程池，不做允许核心线程超时的优化。如果做了优化，可能带来线程周期性的销毁和重建的负面效果
-                    transformThreadPool(cn, methodNode, insnNode, false)
+                    transformThreadPool(cn, methodNode, insnNode, Config.enableThreadPoolOptimized)
                     break
                 case 'defaultThreadFactory':
                     methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
@@ -179,6 +185,46 @@ class HandleThreadTransform extends BaseTransform {
             case THREAD_POOL_EXECUTOR:
                 transformThreadPoolExecutorInvokeSpecial(cn, methodNode, (MethodInsnNode) insnNode)
                 break
+            case TIMER:
+                transformTimerInvokeSpecial(cn, methodNode, insnNode)
+                break
+            default:
+                break
+        }
+    }
+
+    /**
+     * 处理 timer
+     */
+    static def transformTimerInvokeSpecial(ClassNode cn, MethodNode methodNode, MethodInsnNode insnNode) {
+        switch (insnNode.desc) {
+            case '()V':
+                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+                insnNode.desc = '(Ljava/lang/String;)V'
+                break
+            case '(Z)V':
+                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
+                insnNode.desc = '(Ljava/lang/String;Z)V'
+                break
+            case '(Ljava/lang/String;)V':
+                // String -> String,String
+                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+                // String,String -> String
+                methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, SHADOW_TIMER, 'makeTimerName',
+                        '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;', false))
+                break
+            case '(Ljava/lang/String;Z)V':
+                // string,Z -> Z,String
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
+                // Z,string -> Z,String,String
+                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+                // Z,String,String -> Z,String
+                methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, SHADOW_TIMER, 'makeTimerName',
+                        '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;', false))
+                // Z,String -> String ,Z
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
+                break
             default:
                 break
         }
@@ -199,13 +245,13 @@ class HandleThreadTransform extends BaseTransform {
                         '(Ljava/lang/String;)Ljava/util/concurrent/ThreadFactory;', false))
                 insnNode.desc = '(IIJLjava/util/concurrent/TimeUnit;Ljava/util/concurrent/BlockingQueue;Ljava/util/concurrent/ThreadFactory;)V'
                 break
-                //--> int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory
+        //--> int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory
             case '(IIJLjava/util/concurrent/TimeUnit;Ljava/util/concurrent/BlockingQueue;Ljava/util/concurrent/ThreadFactory;)V':
                 methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
                 methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, NAMED_THREAD_FACTORY, 'newInstance',
                         '(Ljava/util/concurrent/ThreadFactory;Ljava/lang/String;)Ljava/util/concurrent/ThreadFactory;', false))
                 break
-                //--> liveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, RejectedExecutionHandler handler
+        //--> liveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, RejectedExecutionHandler handler
             case '(IIJLjava/util/concurrent/TimeUnit;Ljava/util/concurrent/BlockingQueue;Ljava/util/concurrent/RejectedExecutionHandler;)V':
                 methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
                 methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, NAMED_THREAD_FACTORY, 'newInstance',
@@ -213,7 +259,7 @@ class HandleThreadTransform extends BaseTransform {
                 methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
                 insnNode.desc = '(IIJLjava/util/concurrent/TimeUnit;Ljava/util/concurrent/BlockingQueue;Ljava/util/concurrent/ThreadFactory;Ljava/util/concurrent/RejectedExecutionHandler;)V'
                 break
-                //--> int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, RejectedExecutionHandler handler
+        //--> int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, RejectedExecutionHandler handler
             case '(IIJLjava/util/concurrent/TimeUnit;Ljava/util/concurrent/BlockingQueue;Ljava/util/concurrent/ThreadFactory;Ljava/util/concurrent/RejectedExecutionHandler;)V':
                 // ..., threadFactory,handler -> ..., handler,threadFactory
                 methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
@@ -315,11 +361,14 @@ class HandleThreadTransform extends BaseTransform {
     static def transformNew(cn, methodNode, insnNode) {
         if (insnNode instanceof TypeInsnNode) {
             switch (insnNode.desc) {
-                case THREAD_CLASS:
+                case THREAD_CLASS: //thread
                     transformNewInner(cn, methodNode, insnNode, SHADOW_THREAD, false)
                     break
-                case THREAD_POOL_EXECUTOR:
+                case THREAD_POOL_EXECUTOR://threadPoolExecutor
                     transformNewInner(cn, methodNode, insnNode, SHADOW_THREAD_POOL_EXECUTOR, Config.enableThreadPoolOptimized)
+                    break
+                case TIMER: //timer
+                    transformNewInner(cn, methodNode, insnNode, SHADOW_TIMER, false)
                     break
                 default:
                     break
@@ -327,7 +376,7 @@ class HandleThreadTransform extends BaseTransform {
         }
     }
 
-    static def transformNewInner(ClassNode cn, MethodNode methodNode, TypeInsnNode insnNode, type, optimized) {
+    static def transformNewInner(ClassNode cn, MethodNode methodNode, TypeInsnNode insnNode, String type, boolean optimized) {
         def insnList = methodNode.instructions
         int index = insnList.indexOf(insnNode)
         def typeNodeDesc = insnNode.desc
@@ -335,7 +384,8 @@ class HandleThreadTransform extends BaseTransform {
         for (int i = index + 1; i < insnList.size(); i++) {
             AbstractInsnNode node = insnList.get(i)
             if (node instanceof MethodInsnNode && node.opcode == Opcodes.INVOKESPECIAL && node.owner == typeNodeDesc && node.name == "<init>") {
-                def origin = 'owner:' + node.owner + ',name:' + node.name + ',desc:' + node.desc // 记录
+                //记录
+                def origin = 'owner:' + node.owner + ',name:' + node.name + ',desc:' + node.desc
                 insnNode.desc = type
                 node.owner = type
                 //向 descriptor 中添加 String.class 入参
@@ -355,7 +405,7 @@ class HandleThreadTransform extends BaseTransform {
                 }
 
                 //记录
-                def after = 'owner:' + node.owner + ',name:' + node.name + ',desc:' + node.desc // 记录
+                def after = 'owner:' + node.owner + ',name:' + node.name + ',desc:' + node.desc
                 //记录位置
                 recordPosition(cn, methodNode, origin, after)
                 //找到一个就 break
@@ -411,6 +461,8 @@ class HandleThreadTransform extends BaseTransform {
                 builder.append("\r\n")
                 builder.append("\r\n")
             }
+            builder.append('totalCount=').
+                    append(RecordThreadPosition.positionList.size())
             try {
                 byte[] bytes = builder.toString().getBytes("UTF-8")
                 File file = new File(project.rootDir, "hookThread.txt")

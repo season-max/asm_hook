@@ -17,4 +17,9 @@ class PluginParams {
      */
     boolean enableThreadPoolOptimized
 
+    /**
+     * 是否启用执行定时任务的线程池优化
+     */
+    boolean enableScheduleThreadPoolOptimized
+
 }

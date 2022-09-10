@@ -46,8 +46,8 @@ buildscript {
     }
 }
 //-----------上传到 gradle 门户----------
-apply from: 'upload_to_gradlePortal.gradle'
+//apply from: 'upload_to_gradlePortal.gradle'
 
 
-//------------------上传到 github package-----------
-//apply from: 'upload_to_githubPkg.gradle'
+//------------------上传到 github package 或者本地 repo-----------
+apply from: 'upload_to_githubPkg.gradle'

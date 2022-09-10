@@ -11,6 +11,8 @@ import com.zhangyue.ireader.asm_hook.R;
 import com.zhangyue.ireader.toolslibrary.Util;
 
 import java.lang.reflect.Field;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -35,6 +37,10 @@ public class HandleThreadActivity extends AppCompatActivity {
 
         //handle threadPoolExecutor subClass
         handleThreadPoolExecutorSubClass();
+
+        handleTimer();
+
+        handleSubTimer();
 
         //线程
         Runnable runnable = new Runnable() {
@@ -323,6 +329,164 @@ public class HandleThreadActivity extends AppCompatActivity {
                 });
             }
         });
+
+    }
+
+    private void handleTimer() {
+        findViewById(R.id.New_Timer_1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                }, 0);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                timer.cancel();
+            }
+        });
+
+        findViewById(R.id.New_Timer_2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Timer timer = new Timer(false);
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                }, 0);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                timer.cancel();
+            }
+        });
+
+        findViewById(R.id.New_Timer_3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Timer timer = new Timer("MyTimer-----");
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                }, 0);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                timer.cancel();
+            }
+        });
+
+        findViewById(R.id.New_Timer_4).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Timer timer = new Timer("MyTimer-----", false);
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                }, 0);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                timer.cancel();
+            }
+        });
+    }
+
+    private void handleSubTimer() {
+        findViewById(R.id.Sub_Timer_1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Timer timer = new TestTimer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                }, 0);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                timer.cancel();
+            }
+        });
+
+        findViewById(R.id.Sub_Timer_2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Timer timer = new TestTimer(false);
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                }, 0);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                timer.cancel();
+            }
+        });
+
+        findViewById(R.id.Sub_Timer_3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Timer timer = new TestTimer("myTestTimer.11..");
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                }, 0);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                timer.cancel();
+            }
+        });
+
+        findViewById(R.id.Sub_Timer_4).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Timer timer = new TestTimer("myTestTimer.22..", false);
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                }, 0);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                timer.cancel();
+            }
+        });
+
 
     }
 
