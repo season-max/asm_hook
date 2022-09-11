@@ -26,6 +26,7 @@ handle_thread_config {
     printLog = true
     turnOn = true
     enableThreadPoolOptimized = true
+    enableScheduleThreadPoolOptimized = true
 }
 
 

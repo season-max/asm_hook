@@ -10,6 +10,7 @@
         android:orientation="vertical"
         tools:context=".handleThread.HandleThreadActivity">
 
+        <!--****************************Executors****************************-->
         <TextView
             android:text="Executors:"
             android:textSize="20sp"
@@ -18,35 +19,35 @@
 
         <Button
             android:id="@+id/cache"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="cache thread pool"
             android:textSize="12sp" />
 
         <Button
             android:id="@+id/fixed"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="fixed thread pool"
             android:textSize="12sp" />
 
         <Button
             android:id="@+id/single"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="single thread pool"
             android:textSize="12sp" />
 
         <Button
             android:id="@+id/Scheduled"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="Scheduled thread pool"
             android:textSize="12sp" />
 
         <Button
             android:id="@+id/single_scheduled"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="single scheduled thread pool"
             android:textSize="12sp" />
@@ -56,6 +57,8 @@
             android:layout_height="1dp"
             android:background="@color/black" />
 
+        <!--****************************ThreadPoolExecutor****************************-->
+
         <TextView
             android:text="New ThreadPoolExecutor:"
             android:textSize="20sp"
@@ -64,36 +67,38 @@
 
         <Button
             android:id="@+id/thread_pool_executor_1"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
-            android:text="thread_pool_executor_1"
+            android:text="new_thread_pool_executor_1"
             android:textSize="12sp" />
 
         <Button
             android:id="@+id/thread_pool_executor_2"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
-            android:text="thread_pool_executor_2"
+            android:text="new_thread_pool_executor_2"
             android:textSize="12sp" />
 
         <Button
             android:id="@+id/thread_pool_executor_3"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
-            android:text="thread_pool_executor_3"
+            android:text="new_thread_pool_executor_3"
             android:textSize="12sp" />
 
         <Button
             android:id="@+id/thread_pool_executor_4"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
-            android:text="thread_pool_executor_4"
+            android:text="new_thread_pool_executor_4"
             android:textSize="12sp" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/black" />
+
+        <!--****************************ThreadPoolExecutor SubClass****************************-->
 
         <TextView
             android:text="ThreadPoolExecutor subClass"
@@ -103,14 +108,14 @@
 
         <Button
             android:id="@+id/sub_thread_pool_executor_1"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="sub_thread_pool_executor_1"
             android:textSize="12sp" />
 
         <Button
             android:id="@+id/sub_thread_pool_executor_2"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="sub_thread_pool_executor_2"
             android:textSize="12sp" />
@@ -118,7 +123,7 @@
 
         <Button
             android:id="@+id/sub_thread_pool_executor_3"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="sub_thread_pool_executor_3"
             android:textSize="12sp" />
@@ -126,7 +131,7 @@
 
         <Button
             android:id="@+id/sub_thread_pool_executor_4"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="sub_thread_pool_executor_4"
             android:textSize="12sp" />
@@ -136,6 +141,97 @@
             android:layout_height="1dp"
             android:background="@color/black" />
 
+        <!--****************************ScheduleThreadPoolExecutor****************************-->
+
+        <TextView
+            android:text="New ScheduleThreadPoolExecutor"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/schedule_thread_pool_executor_1"
+            android:layout_width="400dp"
+            android:layout_height="50dp"
+            android:text="new_schedule_thread_pool_executor_1"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/schedule_thread_pool_executor_2"
+            android:layout_width="400dp"
+            android:layout_height="50dp"
+            android:text="new_schedule_thread_pool_executor_2"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/schedule_thread_pool_executor_3"
+            android:layout_width="400dp"
+            android:layout_height="50dp"
+            android:text="new_schedule_thread_pool_executor_3"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/schedule_thread_pool_executor_4"
+            android:layout_width="400dp"
+            android:layout_height="50dp"
+            android:text="new_schedule_thread_pool_executor_4"
+            android:textSize="12sp" />
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/black" />
+
+        <!--****************************ThreadPoolExecutor Subclass****************************-->
+
+        <TextView
+            android:text="ScheduleThreadPoolExecutor Subclass"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+        <Button
+            android:id="@+id/sub_schedule_thread_pool_executor_1"
+            android:layout_width="400dp"
+            android:layout_height="50dp"
+            android:text="sub_schedule_thread_pool_executor_1"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/sub_schedule_thread_pool_executor_2"
+            android:layout_width="400dp"
+            android:layout_height="50dp"
+            android:text="sub_schedule_thread_pool_executor_2"
+            android:textSize="12sp" />
+
+
+        <Button
+            android:id="@+id/sub_schedule_thread_pool_executor_3"
+            android:layout_width="400dp"
+            android:layout_height="50dp"
+            android:text="sub_schedule_thread_pool_executor_3"
+            android:textSize="12sp" />
+
+
+        <Button
+            android:id="@+id/sub_schedule_thread_pool_executor_4"
+            android:layout_width="400dp"
+            android:layout_height="50dp"
+            android:text="sub_schedule_thread_pool_executor_4"
+            android:textSize="12sp" />
+
+
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/black" />
+
+        <!--****************************Timer****************************-->
+
         <TextView
             android:text="New Timer"
             android:textSize="20sp"
@@ -144,14 +240,14 @@
 
         <Button
             android:id="@+id/New_Timer_1"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="New_Timer_1"
             android:textSize="12sp" />
 
         <Button
             android:id="@+id/New_Timer_2"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="New_Timer_2"
             android:textSize="12sp" />
@@ -159,7 +255,7 @@
 
         <Button
             android:id="@+id/New_Timer_3"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="New_Timer_3"
             android:textSize="12sp" />
@@ -167,7 +263,7 @@
 
         <Button
             android:id="@+id/New_Timer_4"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="New_Timer_4"
             android:textSize="12sp" />
@@ -177,6 +273,7 @@
             android:layout_height="1dp"
             android:background="@color/black" />
 
+        <!--****************************Timer Subclass****************************-->
         <TextView
             android:text="Timer Subclass"
             android:textSize="20sp"
@@ -185,14 +282,14 @@
 
         <Button
             android:id="@+id/Sub_Timer_1"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="Sub_Timer_1"
             android:textSize="12sp" />
 
         <Button
             android:id="@+id/Sub_Timer_2"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="Sub_Timer_2"
             android:textSize="12sp" />
@@ -200,7 +297,7 @@
 
         <Button
             android:id="@+id/Sub_Timer_3"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="Sub_Timer_3"
             android:textSize="12sp" />
@@ -209,7 +306,7 @@
 
         <Button
             android:id="@+id/Sub_Timer_4"
-            android:layout_width="300dp"
+            android:layout_width="400dp"
             android:layout_height="50dp"
             android:text="Sub_Timer_4"
             android:textSize="12sp" />

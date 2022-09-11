@@ -42,7 +42,9 @@ public class NamedThreadFactory implements ThreadFactory {
         }
         Thread t = this.threadFactory.newThread(r);
         String name = t.getName();
-        name = name.startsWith(MARK) ? name : prefix + "#" + name;
+        if (prefix != null && prefix.trim().length() > 0) {
+            name = prefix + "#thread_" + threadNumber.getAndIncrement();
+        }
         t.setName(name);
         return t;
     }

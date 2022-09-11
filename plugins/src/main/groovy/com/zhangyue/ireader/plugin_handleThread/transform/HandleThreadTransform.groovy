@@ -117,7 +117,7 @@ class HandleThreadTransform extends BaseTransform {
 
     static def transformInvokeStatic(cn, methodNode, insnNode) {
         if (insnNode.owner == THREAD_POOL_UTIL_EXECUTORS) {
-            boolean report = true
+            boolean record = true
             def origin = 'owner:' + insnNode.owner + ',name:' + insnNode.name + ',desc:' + insnNode.desc
             switch (insnNode.name) {
                 case 'newCachedThreadPool':
@@ -136,10 +136,10 @@ class HandleThreadTransform extends BaseTransform {
                     insnNode.desc = insnNode.desc.substring(0, index) + 'Ljava/lang/String;' + insnNode.desc.substring(index)
                     break
                 default:
-                    report = false
+                    record = false
                     break
             }
-            if (report) {
+            if (record) {
                 def after = 'owner:' + insnNode.owner + ',name:' + insnNode.name + ',desc:' + insnNode.desc
                 recordPosition(cn, methodNode, origin, after)
             }
@@ -204,6 +204,8 @@ class HandleThreadTransform extends BaseTransform {
     }
 
     static def transformScheduleThreadPoolExecutorInvokeSpecial(ClassNode cn, MethodNode methodNode, MethodInsnNode insnNode) {
+        boolean record = true
+        def origin = 'owner:' + insnNode.owner + ',name:' + insnNode.name + ',desc:' + insnNode.desc
         switch (insnNode.desc) {
         //int corePoolSize  -> int corePoolSize ,ThreadFactory factory
             case '(I)V':
@@ -213,38 +215,42 @@ class HandleThreadTransform extends BaseTransform {
                 insnNode.desc = '(ILjava/util/concurrent/ThreadFactory;)V'
                 break
         //int corePoolSize,RejectedExecutionHandler handler -> int corePoolSize,ThreadFactory threadFactory,RejectedExecutionHandler handler
-            case '(ILjava/util/concurrent/RejectedExecutionHandler;)':
+            case '(ILjava/util/concurrent/RejectedExecutionHandler;)V':
                 // corePoolSize , handler -> corePoolSize,handler,name
                 methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
                 // corePoolSize,handler,name -> corePoolSize,handler,threadFactory
                 methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, NAMED_THREAD_FACTORY, 'newInstance',
                         '(Ljava/lang/String;)Ljava/util/concurrent/ThreadFactory;', false))
                 // corePoolSize,handler,threadFactory -> corePoolSize,threadFactory,handler,threadFactory
-                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.DUP2_X1))
-                // corePoolSize,threadFactory,handler,threadFactory -> corePoolSize,threadFactory,handler
-                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.POP))
-                insnNode.desc = '(ILjava/util/concurrent/ThreadFactory;Ljava/util/concurrent/RejectedExecutionHandler;)'
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
+                insnNode.desc = '(ILjava/util/concurrent/ThreadFactory;Ljava/util/concurrent/RejectedExecutionHandler;)V'
                 break
         //int corePoolSize,ThreadFactory factory
             case '(ILjava/util/concurrent/ThreadFactory;)V':
                 methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
                 methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, NAMED_THREAD_FACTORY, 'newInstance',
-                        '(Ljava/lang/String;Ljava/util/concurrent/ThreadFactory;)Ljava/util/concurrent/ThreadFactory;', false))
+                        '(Ljava/util/concurrent/ThreadFactory;Ljava/lang/String;)Ljava/util/concurrent/ThreadFactory;', false))
                 break
         //int corePoolSize,ThreadFactory threadFactory,RejectedExecutionHandler handler
-            case '(ILjava/util/concurrent/ThreadFactory;Ljava/util/concurrent/RejectedExecutionHandler;)':
+            case '(ILjava/util/concurrent/ThreadFactory;Ljava/util/concurrent/RejectedExecutionHandler;)V':
                 // corePoolSize,threadFactory,handler -> corePoolSize,handler,threadFactory
                 methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
                 // corePoolSize,handler,threadFactory -> corePoolSize,handler,threadFactory,name
                 methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
                 // corePoolSize,handler,threadFactory,name -> corePoolSize,handler,threadFactory
                 methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, NAMED_THREAD_FACTORY, 'newInstance',
-                        '(Ljava/lang/String;Ljava/util/concurrent/ThreadFactory;)Ljava/util/concurrent/ThreadFactory;', false))
+                        '(Ljava/util/concurrent/ThreadFactory;Ljava/lang/String;)Ljava/util/concurrent/ThreadFactory;', false))
                 // corePoolSize,handler,threadFactory -> corePoolSize,threadFactory,handler
                 methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
                 break
             default:
+                record = false
                 break
+        }
+
+        if (record) {
+            def after = 'owner:' + insnNode.owner + ',name:' + insnNode.name + ',desc:' + insnNode.desc
+            recordPosition(cn, methodNode, origin, after)
         }
     }
 
@@ -252,6 +258,8 @@ class HandleThreadTransform extends BaseTransform {
      * 处理 timer
      */
     static def transformTimerInvokeSpecial(ClassNode cn, MethodNode methodNode, MethodInsnNode insnNode) {
+        boolean record = true
+        def origin = 'owner:' + insnNode.owner + ',name:' + insnNode.name + ',desc:' + insnNode.desc
         switch (insnNode.desc) {
             case '()V':
                 methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
@@ -281,7 +289,13 @@ class HandleThreadTransform extends BaseTransform {
                 methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
                 break
             default:
+                record = false
                 break
+        }
+
+        if (record) {
+            def after = 'owner:' + insnNode.owner + ',name:' + insnNode.name + ',desc:' + insnNode.desc
+            recordPosition(cn, methodNode, origin, after)
         }
     }
 
@@ -290,7 +304,7 @@ class HandleThreadTransform extends BaseTransform {
      * 参数都已经压入操作数栈
      */
     static def transformThreadPoolExecutorInvokeSpecial(ClassNode cn, MethodNode methodNode, MethodInsnNode insnNode) {
-        boolean report = true
+        boolean record = true
         def origin = 'owner:' + insnNode.owner + ',name:' + insnNode.name + ',desc:' + insnNode.desc
         switch (insnNode.desc) {
         //--> int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue
@@ -328,10 +342,10 @@ class HandleThreadTransform extends BaseTransform {
                 methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
                 break
             default:
-                report = false
+                record = false
                 break
         }
-        if (report) {
+        if (record) {
             def after = 'owner:' + insnNode.owner + ',name:' + insnNode.name + ',desc:' + insnNode.desc
             recordPosition(cn, methodNode, origin, after)
         }
@@ -341,7 +355,7 @@ class HandleThreadTransform extends BaseTransform {
      * 处理 Thread
      */
     static def transformThreadInvokeSpecial(ClassNode cn, MethodNode methodNode, MethodInsnNode insnNode) {
-        boolean report = true
+        boolean record = true
         def origin = 'owner:' + insnNode.owner + ',name:' + insnNode.name + ',desc:' + insnNode.desc
         switch (insnNode.desc) {
             case '()V':     // Thread()
@@ -401,10 +415,10 @@ class HandleThreadTransform extends BaseTransform {
                 methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.POP))
                 break
             default:
-                report = false
+                record = false
                 break
         }
-        if (report) {
+        if (record) {
             def after = 'owner:' + insnNode.owner + ',name:' + insnNode.name + ',desc:' + insnNode.desc
             recordPosition(cn, methodNode, origin, after)
         }

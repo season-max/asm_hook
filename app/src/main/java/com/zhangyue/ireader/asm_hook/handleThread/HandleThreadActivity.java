@@ -15,6 +15,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -35,8 +37,14 @@ public class HandleThreadActivity extends AppCompatActivity {
         //threadPoolExecutor
         handleThreadPoolExecutor();
 
-        //handle threadPoolExecutor subClass
+        //threadPoolExecutor subClass
         handleThreadPoolExecutorSubClass();
+
+        //ScheduleThreadPoolExecutor
+        handleScheduleThreadPoolExecutor();
+
+        //ScheduleThreadPoolExecutorSubClass
+        handleScheduleThreadPoolExecutorSubClass();
 
         handleTimer();
 
@@ -85,6 +93,141 @@ public class HandleThreadActivity extends AppCompatActivity {
         }.start();
 
         new MyThread_2("mythread_222").start();
+    }
+
+    private void handleScheduleThreadPoolExecutor() {
+        findViewById(R.id.schedule_thread_pool_executor_1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+                Log.i(TAG, "allowCoreThreadTimeout=" + executor.allowsCoreThreadTimeOut());
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                });
+            }
+        });
+
+        findViewById(R.id.schedule_thread_pool_executor_2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, Executors.defaultThreadFactory());
+                Log.i(TAG, "allowCoreThreadTimeout=" + executor.allowsCoreThreadTimeOut());
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                });
+            }
+        });
+
+        findViewById(R.id.schedule_thread_pool_executor_3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, new RejectedExecutionHandler() {
+                    @Override
+                    public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+
+                    }
+                });
+                Log.i(TAG, "allowCoreThreadTimeout=" + executor.allowsCoreThreadTimeOut());
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                });
+            }
+        });
+
+
+        findViewById(R.id.schedule_thread_pool_executor_4).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, Executors.defaultThreadFactory(), new RejectedExecutionHandler() {
+                    @Override
+                    public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+
+                    }
+                });
+                Log.i(TAG, "allowCoreThreadTimeout=" + executor.allowsCoreThreadTimeOut());
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                });
+            }
+        });
+    }
+
+    private void handleScheduleThreadPoolExecutorSubClass() {
+        findViewById(R.id.sub_schedule_thread_pool_executor_1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ScheduledThreadPoolExecutor executor = new TestScheduleThreadPoolExecutor(1);
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                });
+            }
+        });
+
+        findViewById(R.id.sub_schedule_thread_pool_executor_2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ScheduledThreadPoolExecutor executor = new TestScheduleThreadPoolExecutor(1, Executors.defaultThreadFactory());
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                });
+            }
+        });
+
+
+        findViewById(R.id.sub_schedule_thread_pool_executor_3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ScheduledThreadPoolExecutor executor = new TestScheduleThreadPoolExecutor(1, new RejectedExecutionHandler() {
+                    @Override
+                    public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+
+                    }
+                });
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                });
+            }
+        });
+
+
+        findViewById(R.id.sub_schedule_thread_pool_executor_4).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ScheduledThreadPoolExecutor executor = new TestScheduleThreadPoolExecutor(1, Executors.defaultThreadFactory(), new RejectedExecutionHandler() {
+                    @Override
+                    public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+
+                    }
+                });
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        printlnThreadName();
+                    }
+                });
+            }
+        });
     }
 
     private void printlnThreadName() {
@@ -169,14 +312,18 @@ public class HandleThreadActivity extends AppCompatActivity {
         findViewById(R.id.Scheduled).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Executors.newScheduledThreadPool(1).execute(new Runnable() {
+                ThreadPoolExecutor service = (ThreadPoolExecutor) Executors.newScheduledThreadPool(1);
+                Log.i(TAG, "allowCoreThreadTimeout=" + service.allowsCoreThreadTimeOut());
+                service.execute(new Runnable() {
                     @Override
                     public void run() {
                         printlnThreadName();
                     }
                 });
 
-                Executors.newScheduledThreadPool(1, Executors.defaultThreadFactory()).execute(new Runnable() {
+                ThreadPoolExecutor service2 = (ThreadPoolExecutor) Executors.newScheduledThreadPool(1, Executors.defaultThreadFactory());
+                Log.i(TAG, "allowCoreThreadTimeout=" + service2.allowsCoreThreadTimeOut());
+                service2.execute(new Runnable() {
                     @Override
                     public void run() {
                         printlnThreadName();
@@ -188,14 +335,18 @@ public class HandleThreadActivity extends AppCompatActivity {
         findViewById(R.id.single_scheduled).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Executors.newSingleThreadScheduledExecutor().execute(new Runnable() {
+                ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newSingleThreadScheduledExecutor();
+                Log.i(TAG, "allowCoreThreadTimeout=" + executor.allowsCoreThreadTimeOut());
+                executor.execute(new Runnable() {
                     @Override
                     public void run() {
                         printlnThreadName();
                     }
                 });
 
-                Executors.newSingleThreadScheduledExecutor(Executors.defaultThreadFactory()).execute(new Runnable() {
+                ThreadPoolExecutor executor1 = (ThreadPoolExecutor) Executors.newSingleThreadScheduledExecutor(Executors.defaultThreadFactory());
+                Log.i(TAG, "allowCoreThreadTimeout=" + executor1.allowsCoreThreadTimeOut());
+                executor1.execute(new Runnable() {
                     @Override
                     public void run() {
                         printlnThreadName();

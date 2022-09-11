@@ -153,14 +153,14 @@ public class ShadowExecutors {
 
     // <editor-fold desc="-optimized single schedule thread pool ">
 
-    public static ScheduledExecutorService newSingleThreadScheduledExecutor(String name) {
+    public static ScheduledExecutorService newOptimizedSingleThreadScheduledExecutor(String name) {
         final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory(name));
         executor.setKeepAliveTime(DEFAULT_KEEP_ALIVE_TIME, TimeUnit.MILLISECONDS);
         executor.allowCoreThreadTimeOut(true);
         return executor;
     }
 
-    public static ScheduledExecutorService newSingleThreadScheduledExecutor(ThreadFactory threadFactory, String name) {
+    public static ScheduledExecutorService newOptimizedSingleThreadScheduledExecutor(ThreadFactory threadFactory, String name) {
         final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory(threadFactory, name));
         executor.setKeepAliveTime(DEFAULT_KEEP_ALIVE_TIME, TimeUnit.MILLISECONDS);
         executor.allowCoreThreadTimeOut(true);
