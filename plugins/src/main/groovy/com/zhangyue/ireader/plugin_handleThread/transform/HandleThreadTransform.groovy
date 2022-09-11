@@ -35,6 +35,11 @@ class HandleThreadTransform extends BaseTransform {
     final static String THREAD_POOL_EXECUTOR = 'java/util/concurrent/ThreadPoolExecutor'
 
     /**
+     * scheduledThreadPoolExecutor
+     */
+    final static String SCHEDULED_THREAD_POOL_EXECUTOR = 'java/util/concurrent/ScheduledThreadPoolExecutor'
+
+    /**
      * Executors
      */
     final static String THREAD_POOL_UTIL_EXECUTORS = 'java/util/concurrent/Executors'
@@ -58,6 +63,8 @@ class HandleThreadTransform extends BaseTransform {
     static String SHADOW_TIMER = OPTIMIZE_THREAD_PACKAGE + 'ShadowTimer'
 
     static String SHADOW_THREAD_POOL_EXECUTOR = OPTIMIZE_THREAD_PACKAGE + 'ShadowThreadPoolExecutor'
+
+    static String SHADOW_SCHEDULE_THREAD_POOL_EXECUTOR = OPTIMIZE_THREAD_PACKAGE + 'ShadowScheduleThreadPoolExecutor'
     //线程工厂工具类
     static String NAMED_THREAD_FACTORY = OPTIMIZE_THREAD_PACKAGE + 'NamedThreadFactory'
 
@@ -120,7 +127,7 @@ class HandleThreadTransform extends BaseTransform {
                     break
                 case 'newScheduledThreadPool':
                 case 'newSingleThreadScheduledExecutor':
-                    transformThreadPool(cn, methodNode, insnNode, Config.enableThreadPoolOptimized)
+                    transformThreadPool(cn, methodNode, insnNode, Config.enableScheduleThreadPoolOptimized)
                     break
                 case 'defaultThreadFactory':
                     methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
@@ -187,6 +194,54 @@ class HandleThreadTransform extends BaseTransform {
                 break
             case TIMER:
                 transformTimerInvokeSpecial(cn, methodNode, insnNode)
+                break
+            case SCHEDULED_THREAD_POOL_EXECUTOR:
+                transformScheduleThreadPoolExecutorInvokeSpecial(cn, methodNode, insnNode)
+                break
+            default:
+                break
+        }
+    }
+
+    static def transformScheduleThreadPoolExecutorInvokeSpecial(ClassNode cn, MethodNode methodNode, MethodInsnNode insnNode) {
+        switch (insnNode.desc) {
+        //int corePoolSize  -> int corePoolSize ,ThreadFactory factory
+            case '(I)V':
+                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+                methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, NAMED_THREAD_FACTORY, 'newInstance',
+                        '(Ljava/lang/String;)Ljava/util/concurrent/ThreadFactory;', false))
+                insnNode.desc = '(ILjava/util/concurrent/ThreadFactory;)V'
+                break
+        //int corePoolSize,RejectedExecutionHandler handler -> int corePoolSize,ThreadFactory threadFactory,RejectedExecutionHandler handler
+            case '(ILjava/util/concurrent/RejectedExecutionHandler;)':
+                // corePoolSize , handler -> corePoolSize,handler,name
+                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+                // corePoolSize,handler,name -> corePoolSize,handler,threadFactory
+                methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, NAMED_THREAD_FACTORY, 'newInstance',
+                        '(Ljava/lang/String;)Ljava/util/concurrent/ThreadFactory;', false))
+                // corePoolSize,handler,threadFactory -> corePoolSize,threadFactory,handler,threadFactory
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.DUP2_X1))
+                // corePoolSize,threadFactory,handler,threadFactory -> corePoolSize,threadFactory,handler
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.POP))
+                insnNode.desc = '(ILjava/util/concurrent/ThreadFactory;Ljava/util/concurrent/RejectedExecutionHandler;)'
+                break
+        //int corePoolSize,ThreadFactory factory
+            case '(ILjava/util/concurrent/ThreadFactory;)V':
+                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+                methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, NAMED_THREAD_FACTORY, 'newInstance',
+                        '(Ljava/lang/String;Ljava/util/concurrent/ThreadFactory;)Ljava/util/concurrent/ThreadFactory;', false))
+                break
+        //int corePoolSize,ThreadFactory threadFactory,RejectedExecutionHandler handler
+            case '(ILjava/util/concurrent/ThreadFactory;Ljava/util/concurrent/RejectedExecutionHandler;)':
+                // corePoolSize,threadFactory,handler -> corePoolSize,handler,threadFactory
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
+                // corePoolSize,handler,threadFactory -> corePoolSize,handler,threadFactory,name
+                methodNode.instructions.insertBefore(insnNode, new LdcInsnNode(makeThreadName(cn.name)))
+                // corePoolSize,handler,threadFactory,name -> corePoolSize,handler,threadFactory
+                methodNode.instructions.insertBefore(insnNode, new MethodInsnNode(Opcodes.INVOKESTATIC, NAMED_THREAD_FACTORY, 'newInstance',
+                        '(Ljava/lang/String;Ljava/util/concurrent/ThreadFactory;)Ljava/util/concurrent/ThreadFactory;', false))
+                // corePoolSize,handler,threadFactory -> corePoolSize,threadFactory,handler
+                methodNode.instructions.insertBefore(insnNode, new InsnNode(Opcodes.SWAP))
                 break
             default:
                 break
@@ -366,6 +421,9 @@ class HandleThreadTransform extends BaseTransform {
                     break
                 case THREAD_POOL_EXECUTOR://threadPoolExecutor
                     transformNewInner(cn, methodNode, insnNode, SHADOW_THREAD_POOL_EXECUTOR, Config.enableThreadPoolOptimized)
+                    break
+                case SCHEDULED_THREAD_POOL_EXECUTOR://scheduleThreadPoolExecutor
+                    transformNewInner(cn, methodNode, insnNode, SHADOW_SCHEDULE_THREAD_POOL_EXECUTOR, Config.enableScheduleThreadPoolOptimized)
                     break
                 case TIMER: //timer
                     transformNewInner(cn, methodNode, insnNode, SHADOW_TIMER, false)
