@@ -28,7 +28,7 @@
         }
       }
       dependencies {
-        classpath "io.github.season-max:plugins:0.92"
+        classpath "io.github.season-max:plugins:0.953"
       }
 }
    ```
@@ -39,7 +39,7 @@
 
    ```
    //隐私合规
-   apply plugin: 'privacy.track'
+   apply plugin: 'io.github.season-max.privacycheck'
    privacy_plugin_config {
    		//是否打印日志
        isDebug = false
