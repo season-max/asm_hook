@@ -38,7 +38,6 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
 
     @Override
     byte[] hookClassInner(String className, byte[] bytes) {
-        Logger.info("${getName()} modifyClassInner--------------->")
         def findHookPoint = false
         Map<MethodNode, InsertInsnPoint> collectMap = new HashMap<>()
         ClassReader cr = new ClassReader(bytes)
@@ -84,7 +83,7 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
         methodNode.invisibleAnnotations.find { anno ->
             if (anno.desc == PrivacyGlobalConfig.getHandleAnnotationName()) {
                 findNode = anno
-                println "过滤方法${className} -> ${methodNode.name} -> ${methodNode.desc}"
+                Logger.info("过滤方法${className} -> ${methodNode.name} -> ${methodNode.desc}")
                 //break looping
                 return true
             }
@@ -103,8 +102,6 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
             insnNode.owner = methodReplaceItem.replaceClass
             insnNode.name = methodReplaceItem.replaceMethod
             insnNode.desc = methodReplaceItem.replaceDesc
-
-            println "----> 替换字节码"
         }
     }
 
@@ -246,7 +243,6 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
         insnList.add(new InsnNode(Opcodes.DUP))
         insnList.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/lang/Throwable", "<init>", "()V", false))
         insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, className, writeToFileMethodName, writeToFileMethodDesc))
-        println "插入指令完成 =---------->"
         collectMap.put(methodNode, new InsertInsnPoint(insnList, insnNode))
     }
 
@@ -277,7 +273,6 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
                         && item.targetOwner == owner
                         && item.targetMethod == name
                         && item.targetDesc == desc) {
-                    println "searchHookPoint ---> " + item.toString()
                     hookPoint = item
                 }
             }
@@ -287,17 +282,15 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
 
     @Override
     void onTransformStart(TransformInvocation transformInvocation) {
-        Logger.info("${getName()} start--------------->")
         PrivacyGlobalConfig.stringBuilder.setLength(0)
     }
 
     @Override
     void onTransformEnd(TransformInvocation transformInvocation) {
-        Logger.info("${getName()} end--------------->")
         //写入文件
         byte[] bytes = PrivacyGlobalConfig.stringBuilder.toString().getBytes("UTF-8")
         try {
-            println "project.path= ${project.rootDir}"
+            Logger.info("project.path= ${project.rootDir}")
             def targetFile = new File(project.rootDir, "replaceInsn.txt")
             if (targetFile.exists()) {
                 targetFile.delete()
@@ -305,7 +298,7 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
             targetFile.withOutputStream { it ->
                 it.write(bytes)
             }
-            println "写文件结束，path${targetFile.absolutePath}"
+            Logger.info("写文件结束，path${targetFile.absolutePath}")
         } catch (Exception e) {
             println "写文件时异常，${e.getMessage()}"
         }
@@ -315,9 +308,6 @@ class PrivacyMethodReplaceTransform extends BaseTransform {
      * 静态扫描。记录包含隐私合规方法的类、方法、字节码指令等相关信息
      */
     static void logHookPoint(className, item, methodNode, opcode, owner, name, descriptor, inject) {
-        println("==========scan insn success " +
-                "${opcode} ${owner} ${name} ${descriptor} ======="
-        )
         PrivacyGlobalConfig.stringBuilder.append("targetClass= ${CommonUtil.path2ClassName(className)}")
         PrivacyGlobalConfig.stringBuilder.append("\r\n")
         PrivacyGlobalConfig.stringBuilder.append("invokeMethod= ${methodNode.name}  ${methodNode.desc}")

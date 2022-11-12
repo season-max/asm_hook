@@ -24,6 +24,7 @@ import com.zhangyue.ireader.asm_annotation.sentry_privacy.AsmMethodOpcodes;
 import com.zhangyue.ireader.asm_annotation.sentry_privacy.AsmMethodReplace;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -42,6 +43,9 @@ public class PrivacyConfig {
 
     public static String TAG = "PrivacyConfig";
 
+
+    @SuppressLint("HardwareIds")
+    String serial = Build.SERIAL;
     public static void setTAG(String tag) {
         TAG = tag;
     }
@@ -142,7 +146,7 @@ public class PrivacyConfig {
             , targetClass = CLASS_NAME_ACTIVITYMANAGER)
     public static List<ActivityManager.RunningAppProcessInfo> getRunningAppProcesses(ActivityManager activityManager) {
         if (!checkAgreePrivacy("getRunningAppProcesses")) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
         return activityManager.getRunningAppProcesses();
     }

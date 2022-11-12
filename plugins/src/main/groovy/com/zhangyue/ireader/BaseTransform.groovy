@@ -3,22 +3,21 @@ package com.zhangyue.ireader
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.zhangyue.ireader.util.CommonUtil
-import com.zhangyue.ireader.util.Logger
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
 import org.gradle.api.Project
 
 import java.util.concurrent.AbstractExecutorService
 import java.util.concurrent.Callable
-import java.util.concurrent.ForkJoinPool
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 
 abstract class BaseTransform extends Transform {
-    AbstractExecutorService executorService = ForkJoinPool.commonPool()
-
-    private List<Callable<Void>> taskList = new ArrayList<>()
+    //2
+    AbstractExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2)
 
     protected Project project
 
@@ -49,7 +48,7 @@ abstract class BaseTransform extends Transform {
     @Override
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         super.transform(transformInvocation)
-        println("transform start--------------->")
+        println("${getName()} start--------------->")
         onTransformStart(transformInvocation)
         def startTime = System.currentTimeMillis()
         def inputs = transformInvocation.inputs
@@ -70,43 +69,39 @@ abstract class BaseTransform extends Transform {
 //            }
 //        }
 
-        //3
+        //2
+        def taskList = new ArrayList<Callable<Void>>()
         inputs.each { input ->
-            input.jarInputs.each { jarInput ->
-                submitTask(new Runnable() {
+            input.jarInputs.each {
+                taskList.add(new Callable<Void>() {
                     @Override
-                    void run() {
-                        forEachJar(jarInput, outputProvider, context, isIncremental)
+                    Void call() throws Exception {
+                        forEachJar(it, outputProvider, context, isIncremental)
+                        return null
                     }
                 })
             }
-            input.directoryInputs.each { DirectoryInput dirInput ->
-                submitTask(new Runnable() {
+
+            input.directoryInputs.each {
+                taskList.add(new Callable<Void>() {
                     @Override
-                    void run() {
-                        forEachDir(dirInput, outputProvider, context, isIncremental)
+                    Void call() throws Exception {
+                        forEachDir(it, outputProvider, context, isIncremental)
+                        return null
                     }
                 })
             }
         }
-        def futures = executorService.invokeAll(taskList)
-        futures.each { it ->
+        List<Future> futures = threadPool.invokeAll(taskList)
+        //阻塞等待
+        for (it in futures) {
             it.get()
         }
+
+        //3
         onTransformEnd(transformInvocation)
-        println(getName() + "transform end--------------->" + "duration : " + (System.currentTimeMillis() - startTime) + " ms")
+        println("${getName()} end--------------->" + "duration : " + (System.currentTimeMillis() - startTime) + " ms")
     }
-
-    void submitTask(Runnable runnable) {
-        taskList.add(new Callable<Void>() {
-            @Override
-            Void call() throws Exception {
-                runnable.run()
-                return null
-            }
-        })
-    }
-
 
     void forEachDir(DirectoryInput directoryInput, TransformOutputProvider outputProvider, Context context, boolean isIncremental) {
         def inputDir = directoryInput.file
@@ -116,22 +111,16 @@ abstract class BaseTransform extends Transform {
                 directoryInput.scopes,
                 Format.DIRECTORY
         )
-        println "directoryInputPath:" + directoryInput.file.absolutePath
-        println "destPath:" + dest.absolutePath
         def srcDirPath = inputDir.absolutePath
         def destDirPath = dest.absolutePath
-        def temporaryDir = context.temporaryDir
         FileUtils.forceMkdir(dest)
-        Logger.info("srcDirPath:${srcDirPath}, destDirPath:${destDirPath}")
         if (isIncremental) {
             directoryInput.getChangedFiles().each { entry ->
                 def classFile = entry.key
                 switch (entry.value) {
                     case Status.NOTCHANGED:
-                        Logger.info("处理 class： " + classFile.absoluteFile + " NOTCHANGED")
                         break
                     case Status.REMOVED:
-                        Logger.info("处理 class： " + classFile.absoluteFile + " REMOVED")
                         //最终文件应该存放的路径
                         def destFilePath = classFile.absolutePath.replace(srcDirPath, destDirPath)
                         def destFile = File(destFilePath)
@@ -141,8 +130,7 @@ abstract class BaseTransform extends Transform {
                         break
                     case Status.ADDED:
                     case Status.CHANGED:
-                        Logger.info("处理 class： " + classFile.absoluteFile + " ADDED or CHANGED")
-                        modifyClassFile(classFile, srcDirPath, destDirPath, temporaryDir)
+                        transformClassFile(classFile, srcDirPath, destDirPath)
                         break
                     default:
                         break
@@ -150,53 +138,31 @@ abstract class BaseTransform extends Transform {
             }
         } else {
             com.android.utils.FileUtils.getAllFiles(inputDir).each { File file ->
-                modifyClassFile(file, srcDirPath, destDirPath, temporaryDir)
+                transformClassFile(file, srcDirPath, destDirPath)
             }
         }
     }
 
-    void modifyClassFile(classFile, srcDirPath, destDirPath, temporaryDir) {
-        Logger.info("处理 class： " + classFile.absoluteFile)
+    void transformClassFile(classFile, srcDirPath, destDirPath) {
         //目标路径
         def destFilePath = classFile.absolutePath.replace(srcDirPath, destDirPath)
         def destFile = new File(destFilePath)
         if (destFile.exists()) {
             destFile.delete()
         }
-        Logger.info("处理 class： destFile" + destFile.absoluteFile)
         String className = CommonUtil.path2ClassName(classFile.absolutePath.replace(srcDirPath + File.separator, ""))
-        Logger.info("处理 className： " + className)
-        File modifyFile = null
-        if (CommonUtil.isLegalClass(classFile) && shouldHookClass(className)) {
-            modifyFile = getModifyFile(classFile, temporaryDir, className)
-        }
-        if (modifyFile == null) {
-            modifyFile = classFile
-        }
-        FileUtils.copyFile(modifyFile, destFile)
-    }
-
-    File getModifyFile(File classFile, File temporaryDir, String className) {
         byte[] sourceBytes = IOUtils.toByteArray(new FileInputStream(classFile))
-        def tempFile = new File(temporaryDir, CommonUtil.generateClassFileName(classFile))
-        if (tempFile.exists()) {
-            FileUtils.forceDelete(tempFile)
+        def modifyBytes = null
+        if (CommonUtil.isLegalClass(classFile) && shouldHookClass(className)) {
+            modifyBytes = hookClass(className, sourceBytes)
         }
-        def modifyBytes = modifyClass(className, sourceBytes)
         if (modifyBytes == null) {
             modifyBytes = sourceBytes
         }
-        tempFile.createNewFile()
-        def fos = new FileOutputStream(tempFile)
-        fos.write(modifyBytes)
-        fos.flush()
-        IOUtils.closeQuietly(fos)
-        return tempFile
+        FileUtils.writeByteArrayToFile(destFile, modifyBytes, false)
     }
 
-
     void forEachJar(JarInput jarInput, TransformOutputProvider outputProvider, Context context, boolean isIncremental) {
-        Logger.info("jarInput:" + jarInput.file)
         File destFile = outputProvider.getContentLocation(
                 //防止同名被覆盖
                 CommonUtil.generateJarFileName(jarInput.file), jarInput.contentTypes, jarInput.scopes, Format.JAR)
@@ -205,35 +171,29 @@ abstract class BaseTransform extends Transform {
             Status status = jarInput.status
             switch (status) {
                 case Status.NOTCHANGED:
-                    Logger.info("处理 jar： " + jarInput.file.absoluteFile + " NotChanged")
-                    //Do nothing
-                    return
+                    break
                 case Status.REMOVED:
-                    Logger.info("处理 jar： " + jarInput.file.absoluteFile + " REMOVED")
                     if (destFile.exists()) {
                         FileUtils.forceDelete(destFile)
                     }
-                    return
+                    break
                 case Status.ADDED:
                 case Status.CHANGED:
-                    Logger.info("处理 jar： " + jarInput.file.absoluteFile + " ADDED or CHANGED")
+                    CommonUtil.isLegalJar(jarInput.file) ? transformJar(jarInput.file, destFile)
+                            : FileUtils.copyFile(jarInput.file, destFile)
                     break
             }
+        } else {
+            if (destFile.exists()) {
+                FileUtils.forceDelete(destFile)
+            }
+            CommonUtil.isLegalJar(jarInput.file) ? transformJar(jarInput.file, destFile)
+                    : FileUtils.copyFile(jarInput.file, destFile)
         }
-        if (destFile.exists()) {
-            FileUtils.forceDelete(destFile)
-        }
-        CommonUtil.isLegalJar(jarInput.file) ? transformJar(jarInput.file, context.getTemporaryDir(), destFile)
-                : FileUtils.copyFile(jarInput.file, destFile)
     }
 
-    def transformJar(File jarFile, File temporaryDir, File destFile) {
-        Logger.info("处理 jar： " + jarFile.absoluteFile)
-        File tempOutputJarFile = new File(temporaryDir, CommonUtil.generateJarFileName(jarFile))
-        if (tempOutputJarFile.exists()) {
-            FileUtils.forceDelete(tempOutputJarFile)
-        }
-        JarOutputStream jarOutputStream = new JarOutputStream(new FileOutputStream(tempOutputJarFile))
+    def transformJar(File jarFile, File destFile) {
+        JarOutputStream jarOutputStream = new JarOutputStream(new FileOutputStream(destFile))
         JarFile inputJarFile = new JarFile(jarFile, false)
         try {
             def entries = inputJarFile.entries()
@@ -247,7 +207,7 @@ abstract class BaseTransform extends Transform {
                     if (!jarEntry.isDirectory() && CommonUtil.isLegalClass(entryName)) {
                         String className = CommonUtil.path2ClassName(entryName)
                         if (shouldHookClass(className)) {
-                            modifiedByteArray = modifyClass(className, sourceByteArray)
+                            modifiedByteArray = hookClass(className, sourceByteArray)
                         }
                     }
                     if (modifiedByteArray == null) {
@@ -265,10 +225,9 @@ abstract class BaseTransform extends Transform {
             IOUtils.closeQuietly(jarOutputStream)
             IOUtils.closeQuietly(inputJarFile)
         }
-        FileUtils.copyFile(tempOutputJarFile, destFile)
     }
 
-    private byte[] modifyClass(String className, byte[] sourceBytes) {
+    private byte[] hookClass(String className, byte[] sourceBytes) {
         byte[] classBytesCode
         try {
             classBytesCode = hookClassInner(className, sourceBytes)
@@ -280,7 +239,7 @@ abstract class BaseTransform extends Transform {
         return classBytesCode
     }
 
-    boolean shouldHookClass(String className) {
+    private boolean shouldHookClass(String className) {
         //默认过滤 androidx、android.support
         def excludes = ['android.support', 'androidx']
         if (excludes != null) {

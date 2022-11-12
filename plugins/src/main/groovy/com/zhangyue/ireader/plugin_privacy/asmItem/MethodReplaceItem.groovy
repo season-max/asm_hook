@@ -55,7 +55,6 @@ class MethodReplaceItem {
                 willHook = value
             }
         }
-        Logger.info("=====targetOpcode:${targetOpcode},targetOwner:${targetOwner} , replaceDesc${replaceDesc}")
         if (isEmpty(targetMethod)) {
             targetMethod = replaceMethod
         }
@@ -72,7 +71,6 @@ class MethodReplaceItem {
                 if (index != -1) {
                     param = "(" + param.substring(index + targetOwner.length() + 1)
                 }
-                Logger.info("index::: ${index}")
                 targetDesc = param + result
             }
         }
