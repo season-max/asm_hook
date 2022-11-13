@@ -14,7 +14,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.4'
-        classpath 'com.season-max.gradle:plugins:1.0.5'
+        classpath "io.github.season-max:plugins:0.954"
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
     }
 

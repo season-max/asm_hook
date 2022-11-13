@@ -3,7 +3,7 @@ plugins {
 }
 
 //////隐私合规
-//apply plugin: 'privacy.track'
+//apply plugin: "io.github.season-max.privacycheck"
 //privacy_plugin_config {
 //    isDebug = true
 //    handle_annotation_desc = 'com.zhangyue.ireader.asm_annotation.sentry_privacy.AsmMethodReplace'
@@ -21,12 +21,12 @@ plugins {
 //    annotationName = 'checkClick'
 //}
 //
-//apply plugin: 'optimize_thread'
-//handle_thread_config {
-//    printLog = true
-//    enableThreadPoolOptimized = true
-//    enableScheduleThreadPoolOptimized = true
-//}
+apply plugin: "io.github.season-max.optimizedThread"
+handle_thread_config {
+    printLog = true
+    enableThreadPoolOptimized = true
+    enableScheduleThreadPoolOptimized = true
+}
 
 
 android {
@@ -63,7 +63,10 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
-    implementation project(':toolsLibrary')
-    implementation project(':optimize_thread')
+
+    implementation 'com.github.season-max.asm_hook:optimize_thread:v1.2'
+    implementation 'com.github.season-max.asm_hook:toolsLibrary:v1.2'
+//    implementation project(':toolsLibrary')
+//    implementation project(':optimize_thread')
 //    implementation 'com.github.season-max:asm_hook:1.1'
 }
