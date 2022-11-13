@@ -3,16 +3,16 @@ plugins {
 }
 
 //////隐私合规
-apply plugin: 'privacy.track'
-privacy_plugin_config {
-    isDebug = true
-    handle_annotation_desc = 'com.zhangyue.ireader.asm_annotation.sentry_privacy.AsmMethodReplace'
-    inject = false
-    exclude = ['android.support', 'androidx']
-    recordOwner = "com.zhangyue.ireader.toolslibrary.Util"
-    recordMethod = "writeToFile"
-    recordDesc = "(Ljava/lang/String;)V"
-}
+//apply plugin: 'privacy.track'
+//privacy_plugin_config {
+//    isDebug = true
+//    handle_annotation_desc = 'com.zhangyue.ireader.asm_annotation.sentry_privacy.AsmMethodReplace'
+//    inject = false
+//    exclude = ['android.support', 'androidx']
+//    recordOwner = "com.zhangyue.ireader.toolslibrary.Util"
+//    recordMethod = "writeToFile"
+//    recordDesc = "(Ljava/lang/String;)V"
+//}
 //
 ////双击防抖
 //apply plugin: 'doubleclick_check'
@@ -20,11 +20,10 @@ privacy_plugin_config {
 //    checkAnnotation = 'com.zhangyue.ireader.asm_annotation.double_click.CheckDoubleClick'
 //    annotationName = 'checkClick'
 //}
-
+//
 //apply plugin: 'optimize_thread'
 //handle_thread_config {
 //    printLog = true
-//    turnOn = true
 //    enableThreadPoolOptimized = true
 //    enableScheduleThreadPoolOptimized = true
 //}
@@ -65,5 +64,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     implementation project(':toolsLibrary')
+    implementation project(':optimize_thread')
 //    implementation 'com.github.season-max:asm_hook:1.1'
 }
