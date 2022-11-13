@@ -1,4 +1,4 @@
-#plugin_handleThread 线程优化
+# plugin_handleThread 线程优化
 ## 使用方式
 ```
    //项目根目录
@@ -25,7 +25,8 @@
    }
 }
    ```
-
+## 实现思路
+[ASM 字节码插桩 - 多线程优化]{https://juejin.cn/post/7165499628304449567/#heading-8}
 
 
 # plugin_privacy : 扫描隐私合规相关的方法调用并 hook
