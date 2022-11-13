@@ -1,6 +1,4 @@
-package com.zhangyue.ireader.toolslibrary.optimizeThread;
-
-import static com.zhangyue.ireader.toolslibrary.optimizeThread.ShadowThread.MARK;
+package com.zhangyue.ireader.optimizeThreadProxy;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;

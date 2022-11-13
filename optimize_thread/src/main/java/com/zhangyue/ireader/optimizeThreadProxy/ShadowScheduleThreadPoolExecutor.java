@@ -1,4 +1,4 @@
-package com.zhangyue.ireader.toolslibrary.optimizeThread;
+package com.zhangyue.ireader.optimizeThreadProxy;
 
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledThreadPoolExecutor;

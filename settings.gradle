@@ -3,3 +3,4 @@ rootProject.name = "asm_hook"
 include ':app'
 include ':plugins'
 include ':toolsLibrary'
+include ':optimize_thread'

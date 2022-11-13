@@ -1,4 +1,4 @@
-package com.zhangyue.ireader.toolslibrary.optimizeThread;
+package com.zhangyue.ireader.optimizeThreadProxy;
 
 import java.util.Collection;
 import java.util.List;

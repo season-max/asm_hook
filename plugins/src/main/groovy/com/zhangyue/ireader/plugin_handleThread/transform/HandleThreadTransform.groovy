@@ -52,9 +52,9 @@ class HandleThreadTransform extends BaseTransform {
     /**
      * 线程处理工具集合
      */
-    static String TOOL_LIBRARY_PACKAGE = 'com/zhangyue/ireader/toolslibrary/'
+    static String TOOL_LIBRARY_PACKAGE = 'com/zhangyue/ireader/'
     // 包名
-    static String OPTIMIZE_THREAD_PACKAGE = TOOL_LIBRARY_PACKAGE + 'optimizeThread/'
+    static String OPTIMIZE_THREAD_PACKAGE = TOOL_LIBRARY_PACKAGE + 'optimizeThreadProxy/'
     // 线程处理类
     static String SHADOW_THREAD = OPTIMIZE_THREAD_PACKAGE + "ShadowThread"
     // Executors 处理类
@@ -74,12 +74,12 @@ class HandleThreadTransform extends BaseTransform {
 
     @Override
     protected boolean shouldHookClassInner(String className) {
-        return Config.turnOn
+        return true
     }
 
     @Override
     protected byte[] hookClassInner(String className, byte[] bytes) {
-        if (CommonUtil.getClassInternalName(className).startsWith(TOOL_LIBRARY_PACKAGE)) {
+        if (CommonUtil.getClassInternalName(className).startsWith(OPTIMIZE_THREAD_PACKAGE)) {
             Config.logger("过滤工具类-->" + className)
             return bytes
         }
@@ -455,7 +455,12 @@ class HandleThreadTransform extends BaseTransform {
         //向后遍历，寻找 <init> 方法
         for (int i = index + 1; i < insnList.size(); i++) {
             AbstractInsnNode node = insnList.get(i)
-            if (node instanceof MethodInsnNode && node.opcode == Opcodes.INVOKESPECIAL && node.owner == typeNodeDesc && node.name == "<init>") {
+            if (
+            node instanceof MethodInsnNode
+                    && node.opcode == Opcodes.INVOKESPECIAL
+                    && node.owner == typeNodeDesc
+                    && node.name == "<init>"
+            ) {
                 //记录
                 def origin = 'owner:' + node.owner + ',name:' + node.name + ',desc:' + node.desc
                 insnNode.desc = type

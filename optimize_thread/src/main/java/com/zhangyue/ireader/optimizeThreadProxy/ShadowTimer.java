@@ -1,6 +1,4 @@
-package com.zhangyue.ireader.toolslibrary.optimizeThread;
-
-import android.util.Log;
+package com.zhangyue.ireader.optimizeThreadProxy;
 
 import java.util.Timer;
 import java.util.concurrent.atomic.AtomicInteger;

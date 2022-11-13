@@ -1,6 +1,4 @@
-package com.zhangyue.ireader.toolslibrary.optimizeThread;
-
-import androidx.annotation.Nullable;
+package com.zhangyue.ireader.optimizeThreadProxy;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -46,11 +44,11 @@ public class ShadowThread extends Thread {
         super(generateName(null, className));
     }
 
-    public ShadowThread(@Nullable Runnable target, String className) {
+    public ShadowThread(Runnable target, String className) {
         super(target, generateName(null, className));
     }
 
-    public ShadowThread(@Nullable Runnable target, String name, String className) {
+    public ShadowThread(Runnable target, String name, String className) {
         super(target, generateName(name, className));
     }
 

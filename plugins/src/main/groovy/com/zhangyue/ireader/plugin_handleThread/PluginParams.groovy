@@ -8,11 +8,6 @@ class PluginParams {
     boolean printLog
 
     /**
-     * 是否启用插件
-     */
-    boolean turnOn
-
-    /**
      * 是否启用线程池优化
      */
     boolean enableThreadPoolOptimized
