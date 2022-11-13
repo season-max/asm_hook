@@ -1,7 +1,7 @@
 //上传到 gradle 门户
 apply plugin: "com.gradle.plugin-publish"
 group = 'io.github.season-max' //插件的群组，插件的classpath会用到
-version = '0.953'   //配置插件的版本号
+version = '0.954'   //配置插件的版本号
 //
 pluginBundle {
     website = 'https://github.com/season-max/asm_hook'
